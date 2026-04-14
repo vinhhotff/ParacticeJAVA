@@ -21,6 +21,6 @@ public class User {
     private String firstName;
     private String lastName;
 
-    @ElementCollection // Lưu danh sách Role đơn giản
-    private Set<String> roles;
+    @ManyToMany // Lưu danh sách Role đơn giản
+    private Set<Role> roles;
 }

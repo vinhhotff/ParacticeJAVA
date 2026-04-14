@@ -30,7 +30,8 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
             "/users",
             "/auth/login",
-            "/auth/introspect"
+            "/auth/introspect",
+            "/auth/logout",
     };
 
     @Bean
@@ -46,6 +47,7 @@ public class SecurityConfig {
                                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()) // <--- Dòng mới
         );
+        //---> đoạn code trên return về 1 securityContextHolder
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
@@ -55,7 +57,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);

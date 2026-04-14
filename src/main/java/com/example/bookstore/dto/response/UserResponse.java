@@ -1,5 +1,6 @@
 package com.example.bookstore.dto.response;
 
+import com.example.bookstore.model.Role;
 import lombok.Builder;
 import lombok.Value;
 
@@ -12,5 +13,5 @@ public class UserResponse {
     String username;
     String firstName;
     String lastName;
-    Set<String> roles;
+    Set<RoleResponse> roles;
 }
