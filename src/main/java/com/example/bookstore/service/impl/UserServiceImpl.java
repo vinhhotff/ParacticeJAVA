@@ -6,6 +6,7 @@ import com.example.bookstore.exception.AppException;
 import com.example.bookstore.exception.ErrorCode;
 import com.example.bookstore.mapper.UserMapper;
 import com.example.bookstore.model.User;
+import com.example.bookstore.model.Role;
 import com.example.bookstore.repository.UserRepository;
 import com.example.bookstore.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
         // 3. Mã hóa mật khẩu trước khi lưu
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        user.setRoles(Set.of("USER"));
+        user.setRoles(Set.of(Role.builder().name("USER").build()));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
@@ -45,12 +46,9 @@ public class UserServiceImpl implements UserService {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
-
         User user = userRepository.findByUsername(name)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return userMapper.toUserResponse(user);
     }
-
-
 
 }

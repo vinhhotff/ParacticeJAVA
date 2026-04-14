@@ -8,6 +8,6 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 public class PermissionRequest {
-    String id;
+    String name;
     String description;
 }
