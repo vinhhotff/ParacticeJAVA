@@ -23,4 +23,7 @@ public class User {
 
     @ManyToMany // Lưu danh sách Role đơn giản
     private Set<Role> roles;
+
+    @Version
+    private Integer version;
 }

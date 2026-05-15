@@ -1,6 +1,5 @@
 package com.example.bookstore.dto.response;
 
-import com.example.bookstore.model.Role;
 import lombok.Builder;
 import lombok.Value;
 

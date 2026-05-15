@@ -6,10 +6,10 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL) // Thuộc tính nào null thì không hiện trong JSON
+@JsonInclude(JsonInclude.Include.NON_NULL) 
 public class ApiResponse<T> {
     @Builder.Default
-    int code = 1000; // Mặc định 1000 là thành công
+    int code = 1000; 
     String message;
     T result;
 }

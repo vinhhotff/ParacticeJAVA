@@ -5,17 +5,21 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.annotations.DialectOverride;
-import org.hibernate.annotations.SQLDelete;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.SoftDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "books")
 @SoftDelete(columnName = "deleted")
+@EntityListeners(AuditingEntityListener.class)
 public class Book {
 
     @Id
@@ -37,12 +41,15 @@ public class Book {
     @JsonIgnore
     private Category category;
 
-    @LastModifiedDate
-    private LocalDateTime createdAt;
-
     @CreatedDate
     @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @Version
+    private Integer version;
 
 
     // 1. Constructor không đối số (Bắt buộc cho JPA)
@@ -59,46 +66,6 @@ public class Book {
     }
 
     // --- GETTERS & SETTERS ---
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
 
     // Override toString (Tùy chọn, giúp debug dễ hơn)
     @Override

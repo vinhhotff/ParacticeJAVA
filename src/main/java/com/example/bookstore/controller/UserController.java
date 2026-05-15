@@ -5,6 +5,7 @@ import com.example.bookstore.dto.ApiResponse;
 import com.example.bookstore.dto.response.UserResponse;
 import com.example.bookstore.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
+@PreAuthorize( "hasRole('User')")
+
 public class UserController {
     private final UserService userService;
 

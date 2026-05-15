@@ -13,6 +13,7 @@ public enum ErrorCode {
     USER_EXISTED(1004, " This user already exists", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1006, " User not existed", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1007, "Unauthenticated", HttpStatus.UNAUTHORIZED),
+    UNAUTHORIZED(1008, "You do not have permission", HttpStatus.FORBIDDEN),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

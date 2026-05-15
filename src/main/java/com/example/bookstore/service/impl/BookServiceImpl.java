@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 @RequiredArgsConstructor
@@ -27,24 +29,28 @@ public class BookServiceImpl implements BookService {
     private final BookMapper bookMapper;
 
     @Override
+    @Cacheable(value = "books", key = "'all'")
     public List<BookResponse> getAllBooks() {
         List<Book> books = bookRepository.findAll();
         return books.stream().map(bookMapper::toBookResponse).toList();
     }
 
     @Override
+    @Cacheable(value = "book_detail", key = "#id")
     public BookResponse getBookById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.BOOK_NOT_EXISTED));
         return bookMapper.toBookResponse(book);
     }
 
     @Override
+    @CacheEvict(value = {"books", "book_detail"}, allEntries = true)
     public BookResponse saveBook(BookRequest request) {
         Book book = bookMapper.toBook(request);
         return bookMapper.toBookResponse(bookRepository.save(book));
     }
 
     @Override
+    @CacheEvict(value = {"books", "book_detail"}, allEntries = true)
     public BookResponse updateBook(Long id, BookRequest request) {
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_EXISTED));
@@ -58,6 +64,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @CacheEvict(value = {"books", "book_detail"}, allEntries = true)
     public void deleteBook(Long id) {
         if(!bookRepository.existsById(id)) {
             throw new AppException(ErrorCode.BOOK_NOT_EXISTED);
@@ -66,6 +73,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @CacheEvict(value = {"books", "book_detail"}, allEntries = true)
     public BookResponse addBooktoCategory(Long categoryId, BookRequest request) {
         return categoryRepository.findById(categoryId).map(category -> {
             Book book = bookMapper.toBook(request);
@@ -75,6 +83,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Cacheable(value = "books", key = "'category_' + #categoryId")
     public List<BookResponse> getBooksByCategory(Long categoryId) {
         if(!categoryRepository.existsById(categoryId)){
             throw new AppException(ErrorCode.CATEGORY_NOT_FOUND); // Nên dùng lỗi Category
@@ -85,6 +94,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Cacheable(value = "books", key = "'title_' + (#title != null ? #title : 'all')")
     public List<BookResponse> getBooksByTitle(String title) {
         List<Book> books;
         if (title != null && !title.isEmpty()) {
@@ -98,6 +108,7 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
     @Override
+    @Cacheable(value = "books", key = "'page_' + #pageable.pageNumber + '_' + #pageable.pageSize")
     public Page<BookResponse> getAllBooksPaged(Pageable pageable) {
         Page<Book> bookPage = bookRepository.findAll(pageable);
 

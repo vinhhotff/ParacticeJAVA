@@ -2,7 +2,6 @@ package com.example.bookstore.service;
 
 import com.example.bookstore.dto.request.BookRequest;
 import com.example.bookstore.dto.response.BookResponse;
-import com.example.bookstore.model.Book;
 import org.springframework.data.domain.Page; // SỬA Ở ĐÂY: Dùng springframework
 import org.springframework.data.domain.Pageable;
 
