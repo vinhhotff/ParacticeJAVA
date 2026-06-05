@@ -71,7 +71,12 @@ Allowed types:
 *   `test`: Adding missing tests or correcting existing tests.
 *   `chore`: Changes to the build process or auxiliary tools/libraries (e.g. build configs).
 
-### 3.3 Verification Rule
+### 3.3 Pushing & Branching Rules
+*   **NEVER** commit or push directly to `master` or `main` branch.
+*   Always create a new local branch using the standard branch naming convention (e.g., `feature/*`, `bugfix/*`) before making changes.
+*   Once development is complete, commit and push the branch to the remote repository, allowing the user to review and merge it.
+
+### 3.4 Verification Rule
 *   Before committing or pushing any code, run the compiler (`./mvnw clean compile`) to ensure everything compiles successfully.
 
 ---
