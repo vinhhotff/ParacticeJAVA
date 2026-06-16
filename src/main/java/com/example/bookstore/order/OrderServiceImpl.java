@@ -16,6 +16,8 @@ import com.example.bookstore.order.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 
@@ -65,8 +67,17 @@ public class OrderServiceImpl implements OrderService {
         order.setItems(List.of(orderItem));
         orderRepository.save(order);
 
-        // Send Email Confirmation asynchronously
-        emailService.sendOrderConfirmation(user.getEmail());
+        // Send Email Confirmation asynchronously ONLY after transaction commits successfully
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    emailService.sendOrderConfirmation(user.getEmail());
+                }
+            });
+        } else {
+            emailService.sendOrderConfirmation(user.getEmail());
+        }
     }
 
     @Override

@@ -1,8 +1,7 @@
 package com.example.bookstore.exception;
 
-import com.example.bookstore.user.User;
-
 import com.example.bookstore.common.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ApiResponse> handlingRuntimeException(Exception exception) {
         // Tốt nhất nên in log lỗi này ra để dev fix, không trả về cho user
-        exception.printStackTrace(); 
+        log.error("Unhandled runtime exception occurred: ", exception); 
         
         ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
         ApiResponse apiResponse = ApiResponse.builder()
