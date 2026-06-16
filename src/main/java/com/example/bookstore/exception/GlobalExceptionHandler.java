@@ -1,7 +1,10 @@
 package com.example.bookstore.exception;
 
-import com.example.bookstore.dto.ApiResponse;
+import com.example.bookstore.user.User;
+
+import com.example.bookstore.common.ApiResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,8 +29,8 @@ public class GlobalExceptionHandler {
     }
 
     // Bắt lỗi khi người dùng truy cập API không đủ quyền (Ví dụ: Cần Admin nhưng lại là User)
-    @ExceptionHandler(value = org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<ApiResponse> handlingAccessDeniedException(org.springframework.security.access.AccessDeniedException exception) {
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<ApiResponse> handlingAccessDeniedException(AccessDeniedException exception) {
         ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
         ApiResponse apiResponse = ApiResponse.builder()
                 .code(errorCode.getCode())

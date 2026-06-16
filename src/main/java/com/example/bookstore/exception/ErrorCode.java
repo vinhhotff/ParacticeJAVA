@@ -1,5 +1,7 @@
 package com.example.bookstore.exception;
 
+import com.example.bookstore.user.User;
+
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -15,6 +17,8 @@ public enum ErrorCode {
     UNAUTHENTICATED(1007, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1008, "You do not have permission", HttpStatus.FORBIDDEN),
     INSUFFICIENT_STOCK(1009, "Không đủ số lượng sách trong kho", HttpStatus.BAD_REQUEST),
+    EMAIL_EXISTED(1010, "Email đã được đăng ký sử dụng bởi tài khoản khác", HttpStatus.BAD_REQUEST),
+    EMAIL_NOT_EXISTED(1011, "Email không tồn tại trong hệ thống", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

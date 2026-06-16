@@ -4,222 +4,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${book.title} + ' - Chi tiết sách'">Chi tiết sách</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    
+    <title th:text="${book.title} + ' - BookFlow'"></title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // Indigo-600
+                        primaryHover: '#4338CA', // Indigo-700
+                        bgSlate: '#F8FAFC',
+                        cardBg: '#FFFFFF',
+                        borderSlate: '#E2E8F0',
+                        emeraldAccent: '#10B981',
+                        amberAccent: '#F59E0B',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;850&amp;display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A; /* slate-900 */
+            scroll-behavior: smooth;
         }
-        .navbar-brand {
-            font-weight: 700;
-            letter-spacing: -0.5px;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .detail-card {
-            border: none;
-            border-radius: 20px;
-            background-color: white;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-            overflow: hidden;
+        ::-webkit-scrollbar-track {
+            background: #F8FAFC;
         }
-        .book-cover-placeholder {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            color: white;
-            min-height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
         }
-        .book-price {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #4f46e5;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
         }
-        .btn-primary-custom {
-            background-color: #4f46e5;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            padding: 0.8rem 2rem;
-            transition: all 0.2s;
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
-        .btn-primary-custom:hover:not(:disabled) {
-            background-color: #4338ca;
-            transform: scale(1.02);
-        }
-        .back-link {
-            text-decoration: none;
-            color: #6c757d;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .back-link:hover {
-            color: #4f46e5;
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex antialiased">
 
-    <!-- Header Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3 sticky-top">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="/books">
-                <i class="bi bi-book-half text-primary me-2 fs-3"></i>
-                <span>THƯ VIỆN SỐ</span>
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-borderSlate flex flex-col justify-between p-6 transition-transform duration-300 -translate-x-full md:translate-x-0 shadow-sm">
+        <div class="space-y-8">
+            <!-- Brand Logo -->
+            <a href="/" class="flex items-center space-x-3 cursor-pointer">
+                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-md shadow-primary/20">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-lg font-bold tracking-tight text-slate-900">Book<span class="text-primary">Flow</span></span>
+                    <span class="block text-[10px] text-slate-400 uppercase tracking-widest font-black">Subscription</span>
+                </div>
             </a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/books"><i class="bi bi-house-door-fill me-1"></i>Trang Chủ</a>
-                    </li>
-                    <li class="nav-item ms-3" sec:authorize="isAuthenticated()">
-                        <span class="navbar-text text-white me-3">
-                            Chào, <strong sec:authentication="name">User</strong>
-                        </span>
-                    </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="btn btn-outline-danger btn-sm rounded-pill px-3" href="/logout">
-                            Đăng xuất
-                        </a>
-                    </li>
-                    <li class="nav-item ms-3" sec:authorize="!isAuthenticated()">
-                        <a class="btn btn-outline-primary btn-sm rounded-pill px-4" href="/login">
-                            Đăng nhập
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Container -->
-    <div class="container my-5">
-        
-        <!-- Link Quay lại -->
-        <div class="mb-4">
-            <a href="/books" class="back-link d-inline-flex align-items-center">
-                <i class="bi bi-arrow-left me-2"></i> Quay lại danh sách sách
-            </a>
+            <!-- Navigation Links -->
+            <nav class="space-y-1">
+                <a href="/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all cursor-pointer">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/books" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-semibold text-sm transition-all cursor-pointer">
+                    <i data-lucide="library" class="w-4 h-4"></i>
+                    <span>Explore Catalog</span>
+                </a>
+                <a href="/books/my-orders" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all cursor-pointer">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                    <span>My Orders</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all cursor-pointer">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Account Settings</span>
+                </a>
+            </nav>
         </div>
 
-        <!-- Alerts -->
-        <div class="alert alert-success alert-dismissible fade show rounded-4 mb-4" role="alert" th:if="${successMessage}">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            <span th:text="${successMessage}">Đặt hàng thành công!</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        
-        <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4" role="alert" th:if="${errorMessage}">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <span th:text="${errorMessage}">Đặt hàng thất bại!</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-
-        <!-- Book Detail Card -->
-        <div class="card detail-card">
-            <div class="row g-0">
-                <!-- Cột trái: Ảnh Cover sách minh họa -->
-                <div class="col-md-5">
-                    <div class="book-cover-placeholder text-center p-5">
-                        <div>
-                            <i class="bi bi-journal-bookmark-fill text-white opacity-75" style="font-size: 8rem;"></i>
-                            <h3 class="fw-bold mt-4 mb-0" th:text="${book.title}">Tên Sách</h3>
-                            <p class="text-white-50 mt-1" th:text="${book.author}">Tác giả</p>
-                        </div>
+        <!-- User Profile Bottom Area -->
+        <div class="border-t border-borderSlate pt-6">
+            <div class="flex items-center justify-between">
+                <!-- Logged in user info -->
+                <div class="flex items-center space-x-3" sec:authorize="isAuthenticated()">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-[#818CF8] flex items-center justify-center font-bold text-white shadow-sm">
+                        <span th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">U</span>
+                    </div>
+                    <div class="truncate max-w-[120px]">
+                        <span class="block text-sm font-semibold text-slate-800" sec:authentication="name">User</span>
+                        <span class="block text-xs text-primary font-bold">Member</span>
                     </div>
                 </div>
+                <!-- Not logged in user info -->
+                <div class="flex items-center space-x-3" sec:authorize="isAnonymous()">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-semibold text-slate-800">Guest</span>
+                        <a href="/login" class="text-xs text-primary hover:underline font-medium cursor-pointer">Sign In</a>
+                    </div>
+                </div>
+                
+                <!-- Logout icon button -->
+                <div sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" class="inline">
+                        <button type="submit" class="text-slate-400 hover:text-red-500 p-2 rounded-lg hover:bg-slate-50 cursor-pointer" title="Log Out">
+                            <i data-lucide="log-out" class="w-5 h-5"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </aside>
 
-                <!-- Cột phải: Thông tin chi tiết sách & Form mua hàng -->
-                <div class="col-md-7">
-                    <div class="card-body p-5 d-flex flex-column h-100 justify-content-center">
-                        
-                        <!-- Badge thể loại -->
-                        <span class="badge bg-light text-primary align-self-start mb-3 px-3 py-2 rounded-pill fw-semibold" 
-                              th:text="${book.categoryName}">Thể loại</span>
-                              
-                        <!-- Tiêu đề & Tác giả -->
-                        <h1 class="fw-bold text-dark mb-2" th:text="${book.title}">Tên Tác Phẩm</h1>
-                        <h5 class="text-muted mb-4">Tác giả: <strong class="text-dark" th:text="${book.author}">Tác giả</strong></h5>
-                        
-                        <!-- Giá sách -->
-                        <div class="mb-4">
-                            <span class="text-muted d-block small">Giá niêm yết</span>
-                            <span class="book-price" th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+    <!-- Mobile Header overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/40 hidden transition-opacity duration-300 md:hidden"></div>
+
+    <!-- Main Content Area -->
+    <div class="flex-grow md:pl-64 flex flex-col min-h-screen">
+        
+        <!-- Top bar -->
+        <header class="h-16 border-b border-borderSlate px-6 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-20">
+            <div class="flex items-center space-x-4">
+                <button id="sidebar-toggle" class="md:hidden text-slate-600 hover:text-slate-900 p-2 rounded-lg hover:bg-slate-50 focus:outline-none cursor-pointer">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <a href="/books" class="flex items-center space-x-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Back to Catalog</span>
+                </a>
+            </div>
+
+            <!-- Right controls -->
+            <div class="flex items-center space-x-4">
+                <div class="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center space-x-1">
+                    <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                    <span>Connected to Database</span>
+                </div>
+                <!-- Redirect attributes feedback messages -->
+                <div th:if="${successMessage}" class="hidden" id="thymeleaf-success" th:text="${successMessage}"></div>
+                <div th:if="${errorMessage}" class="hidden" id="thymeleaf-error" th:text="${errorMessage}"></div>
+            </div>
+        </header>
+
+        <!-- Detail Container -->
+        <main class="flex-grow p-6 space-y-6 max-w-5xl mx-auto w-full">
+            
+            <section class="bg-white rounded-3xl border border-borderSlate shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-12">
+                
+                <!-- Left Column: Visual graphic -->
+                <div class="md:col-span-5 bg-gradient-to-tr from-indigo-50/50 to-blue-50/20 border-b md:border-b-0 md:border-r border-borderSlate p-8 flex flex-col items-center justify-center min-h-[350px] relative">
+                    <div class="absolute inset-0 bg-[radial-gradient(#e0e7ff_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+                    
+                    <div class="float-animation flex items-center justify-center w-36 h-48 bg-white border border-borderSlate rounded-2xl shadow-xl shadow-indigo-100/40 relative z-10">
+                        <i data-lucide="journal-bookmark-fill" class="w-16 h-16 text-primary" style="display:none;"></i>
+                        <i data-lucide="book" class="w-16 h-16 text-primary"></i>
+                    </div>
+                    
+                    <h3 class="font-extrabold text-slate-800 text-lg mt-6 text-center px-4 relative z-10" th:text="${book.title}">Book Title</h3>
+                    <p class="text-xs text-slate-400 mt-1 relative z-10" th:text="'By ' + ${book.author}">By Author</p>
+                </div>
+
+                <!-- Right Column: Info & Forms -->
+                <div class="md:col-span-7 p-6 sm:p-10 flex flex-col justify-center space-y-6 bg-white">
+                    <div>
+                        <span class="inline-flex items-center space-x-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" 
+                              th:text="${book.categoryName}">Category</span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight" th:text="${book.title}">Book Title</h1>
+                        <p class="text-sm text-slate-500">Tác giả: <span class="font-bold text-slate-700" th:text="${book.author}">Author</span></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 py-4 border-t border-b border-borderSlate">
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Đơn giá niêm yết</span>
+                            <span class="text-xl sm:text-2xl font-black text-slate-800 mt-1 block" th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
                         </div>
-                        
-                        <!-- Tình trạng kho -->
-                        <div class="mb-4">
-                            <span class="text-muted d-block small mb-1">Tình trạng tồn kho</span>
-                            <span th:if="${book.stock > 0}" class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-semibold">
-                                <i class="bi bi-check-circle-fill me-1"></i> Còn hàng (<span th:text="${book.stock}">0</span> cuốn)
-                            </span>
-                            <span th:if="${book.stock <= 0}" class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill fw-semibold">
-                                <i class="bi bi-x-circle-fill me-1"></i> Hết hàng
-                            </span>
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Tình trạng trong kho</span>
+                            
+                            <div class="mt-2.5">
+                                <span th:if="${book.stock > 0}" class="inline-flex items-center space-x-1 text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-full text-xs">
+                                    <span class="w-1.5 h-1.5 bg-emeraldAccent rounded-full inline-block"></span>
+                                    <span>Còn hàng (<span th:text="${book.stock}">0</span> cuốn)</span>
+                                </span>
+                                <span th:if="${book.stock <= 0}" class="inline-flex items-center space-x-1 text-red-500 font-bold bg-red-50 px-3 py-1 rounded-full text-xs">
+                                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full inline-block"></span>
+                                    <span>Hết hàng</span>
+                                </span>
+                            </div>
                         </div>
+                    </div>
 
-                        <hr class="my-4">
-
-                        <!-- KHU VỰC THAO TÁC MUA HÀNG -->
-                        
-                        <!-- Trường hợp 1: Người dùng ĐÃ ĐĂNG NHẬP -->
+                    <!-- Actions -->
+                    <div>
+                        <!-- Logged In Form -->
                         <div sec:authorize="isAuthenticated()">
-                            <form th:action="@{/books/orders}" method="POST" class="row g-3 align-items-center" th:if="${book.stock > 0}">
-                                <!-- Hidden input để gửi Book ID -->
+                            <form th:action="@{/books/orders}" method="POST" class="space-y-4" th:if="${book.stock > 0}">
                                 <input type="hidden" name="bookId" th:value="${book.id}">
                                 
-                                <div class="col-auto">
-                                    <label for="quantity" class="col-form-label fw-semibold">Số lượng mua:</label>
-                                </div>
-                                <div class="col-auto" style="width: 100px;">
-                                    <input type="number" id="quantity" name="quantity" class="form-control rounded-3" 
+                                <div class="flex items-center space-x-3">
+                                    <label for="quantity" class="text-xs font-bold text-slate-500 uppercase">Số lượng:</label>
+                                    <input type="number" id="quantity" name="quantity" class="bg-slate-50 border border-borderSlate rounded-xl px-4 py-2 w-20 text-center text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary" 
                                            value="1" min="1" th:max="${book.stock}">
                                 </div>
-                                <div class="col-auto">
-                                    <button type="submit" class="btn btn-primary-custom text-white">
-                                        <i class="bi bi-cart-plus-fill me-2"></i>Đặt Mua Ngay
-                                    </button>
-                                </div>
+
+                                <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all duration-200 cursor-pointer shadow-md shadow-primary/10 flex items-center justify-center space-x-2">
+                                    <i data-lucide="key" class="w-4 h-4"></i>
+                                    <span>Đặt Mua &amp; Rent Ngay</span>
+                                </button>
                             </form>
-                            
-                            <div th:if="${book.stock <= 0}" class="alert alert-warning border-0 rounded-4 p-3 d-flex align-items-center">
-                                <i class="bi bi-info-circle-fill fs-4 me-3 text-warning"></i>
-                                <div>Cuốn sách này hiện đã hết hàng trong thư viện. Vui lòng quay lại sau!</div>
+
+                            <div th:if="${book.stock <= 0}" class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-start space-x-3 text-amber-700">
+                                <i data-lucide="info" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                                <p class="text-xs">Cuốn sách này hiện đã hết hàng trong thư viện. Vui lòng quay lại sau!</p>
                             </div>
                         </div>
 
-                        <!-- Trường hợp 2: Người dùng CHƯA ĐĂNG NHẬP -->
-                        <div sec:authorize="!isAuthenticated()" class="alert alert-secondary border-0 rounded-4 p-3 d-flex flex-column flex-md-row align-items-center justify-content-between">
-                            <div class="d-flex align-items-center mb-3 mb-md-0">
-                                <i class="bi bi-lock-fill fs-4 me-3 text-secondary"></i>
-                                <span>Bạn cần đăng nhập để thực hiện đặt mua cuốn sách này.</span>
+                        <!-- Anonymous warning -->
+                        <div sec:authorize="!isAuthenticated()" class="bg-slate-50 border border-borderSlate rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="flex items-center space-x-3 text-center sm:text-left">
+                                <i data-lucide="lock" class="w-5 h-5 text-amber-500 shrink-0"></i>
+                                <span class="text-xs text-slate-500">Bạn cần đăng nhập để thực hiện đặt thuê cuốn sách này.</span>
                             </div>
-                            <a href="/login" class="btn btn-dark rounded-pill btn-sm px-4 py-2">
-                                Đăng Nhập <i class="bi bi-box-arrow-in-right ms-1"></i>
+                            <a href="/login" class="bg-primary hover:bg-primaryHover text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap">
+                                Đăng Nhập
                             </a>
                         </div>
-
                     </div>
                 </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white text-slate-400 py-8 px-6 border-t border-borderSlate text-center mt-12">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 text-xs">
+                <p>&copy; 2026 BookFlow Subscription Platform. Fully integrated backend.</p>
+                <div class="flex space-x-6">
+                    <a href="/books" class="hover:text-slate-600 transition-colors cursor-pointer">Public Catalog</a>
+                    <a href="/books/my-orders" class="hover:text-slate-600 transition-colors cursor-pointer">My Orders</a>
+                    <a href="#" class="hover:text-slate-600 transition-colors cursor-pointer">Terms &amp; API</a>
+                </div>
             </div>
+        </footer>
+    </div>
+
+    <!-- Alert / Toast Component -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 bg-white border border-borderSlate rounded-2xl p-4 shadow-xl flex items-start space-x-3 max-w-sm hidden transition-all duration-300 transform translate-y-10 opacity-0">
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-primary flex items-center justify-center shrink-0" id="toast-icon-bg">
+            <i data-lucide="check" class="w-4 h-4" id="toast-icon"></i>
+        </div>
+        <div>
+            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider" id="toast-title">Success</h4>
+            <p class="text-xs text-slate-500 mt-0.5" id="toast-message">Transaction processed successfully.</p>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container text-center">
-            <p class="mb-1">&copy; 2026 Thư Viện Số - Bookstore. All Rights Reserved.</p>
-        </div>
-    </footer>
+    <!-- Page Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
 
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        // Mobile Sidebar Toggle
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        if (toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+        if (overlay) overlay.addEventListener('click', toggleSidebar);
+
+        // Feedback toasts handling
+        const successMsgEl = document.getElementById('thymeleaf-success');
+        const errorMsgEl = document.getElementById('thymeleaf-error');
+        
+        function showToast(title, message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMsg = document.getElementById('toast-message');
+            const iconBg = document.getElementById('toast-icon-bg');
+            const icon = document.getElementById('toast-icon');
+
+            toastTitle.textContent = title;
+            toastMsg.textContent = message;
+
+            if (isError) {
+                iconBg.className = "w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0";
+                icon.setAttribute('data-lucide', 'alert-triangle');
+            } else {
+                iconBg.className = "w-8 h-8 rounded-lg bg-indigo-50 text-primary flex items-center justify-center shrink-0";
+                icon.setAttribute('data-lucide', 'check');
+            }
+            lucide.createIcons();
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 5000);
+        }
+
+        if (successMsgEl && successMsgEl.textContent.trim()) {
+            showToast('Đặt Mua Thành Công', successMsgEl.textContent.trim(), false);
+        }
+        if (errorMsgEl && errorMsgEl.textContent.trim()) {
+            showToast('Lỗi Đặt Mua', errorMsgEl.textContent.trim(), true);
+        }
+    </script>
 </body>
 </html>

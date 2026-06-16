@@ -1,16 +1,18 @@
 package com.example.bookstore.config;
 
-import com.example.bookstore.repository.UserRepository;
+import com.example.bookstore.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -66,7 +68,7 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 )
-                .cors(org.springframework.security.config.Customizer.withDefaults());
+                .cors(Customizer.withDefaults());
 
         return httpSecurity.build();
     }
@@ -81,7 +83,7 @@ public class SecurityConfig {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**", "/webjars/**").permitAll()
+                        .requestMatchers("/", "/books", "/books/{id:\\d+}", "/books/categories/**", "/login", "/register", "/css/**", "/js/**", "/webjars/**", "/favicon.ico").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -101,11 +103,11 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> {
-            com.example.bookstore.model.User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+            var user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
-            return org.springframework.security.core.userdetails.User.builder()
-                    .username(user.getUsername())
+            return User.builder()
+                    .username(user.getEmail())
                     .password(user.getPassword())
                     .authorities(user.getRoles().stream()
                             .map(role -> "ROLE_" + role.getName())
@@ -136,6 +138,7 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
+
 
     @Bean
     JwtDecoder jwtDecoder() {

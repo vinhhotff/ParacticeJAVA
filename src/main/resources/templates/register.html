@@ -3,154 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký - Thư Viện Số</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    
+    <title>Đăng Ký - BookFlow</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // Indigo-600
+                        primaryHover: '#4338CA', // Indigo-700
+                        bgSlate: '#F8FAFC',
+                        cardBg: '#FFFFFF',
+                        borderSlate: '#E2E8F0',
+                        emeraldAccent: '#10B981',
+                        amberAccent: '#F59E0B',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;850&amp;display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-        .register-card {
-            border: none;
-            border-radius: 24px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            max-width: 500px;
-            width: 100%;
-            overflow: hidden;
-        }
-        .register-header {
-            background-color: #1e1e2f;
-            color: white;
-            padding: 2rem 2rem;
-            text-align: center;
-        }
-        .form-control-custom {
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            transition: all 0.2s;
-        }
-        .form-control-custom:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-            outline: none;
-        }
-        .btn-register {
-            background-color: #4f46e5;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 0.8rem;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.2s;
-        }
-        .btn-register:hover {
-            background-color: #4338ca;
-            transform: translateY(-2px);
-        }
-        .btn-link-custom {
-            color: #64748b;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .btn-link-custom:hover {
-            color: #4f46e5;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#F8FAFC] bg-[radial-gradient(at_0%_0%,rgba(99,102,241,0.08)_0px,transparent_50%),radial-gradient(at_100%_100%,rgba(129,140,248,0.06)_0px,transparent_50%)]">
 
-    <div class="register-card">
-        <!-- Card Header -->
-        <div class="register-header">
-            <i class="bi bi-person-plus display-4 text-primary mb-2"></i>
-            <h3 class="fw-bold mb-1">Đăng Ký Tài Khoản</h3>
-            <p class="text-white-50 mb-0">Tạo tài khoản để tham gia Thư Viện Số</p>
+    <!-- Card Container -->
+    <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl max-w-lg w-full relative z-10 transition-all duration-300">
+        
+        <!-- Logo & Header -->
+        <div class="text-center space-y-4 mb-8">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-primary rounded-2xl text-white shadow-md shadow-primary/20">
+                <i data-lucide="user-plus" class="w-6 h-6"></i>
+            </div>
+            <div class="space-y-1.5">
+                <h3 class="text-2xl font-black tracking-tight text-slate-900">Tạo tài khoản mới</h3>
+                <p class="text-xs text-slate-500 leading-normal">Tham gia BookFlow để thuê và trải nghiệm hàng ngàn tác phẩm</p>
+            </div>
         </div>
 
-        <!-- Card Body -->
-        <div class="card-body p-4 p-md-5">
-            
+        <!-- Alerts Section -->
+        <div class="space-y-3 mb-6" th:if="${errorMessage}">
             <!-- Alert Lỗi Đăng Ký -->
-            <div class="alert alert-danger border-0 rounded-4 py-3 mb-4 d-flex align-items-center" role="alert" th:if="${errorMessage}">
-                <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
-                <div class="small" th:text="${errorMessage}">Đăng ký thất bại!</div>
+            <div class="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-start space-x-3 text-red-700">
+                <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 text-red-500 mt-0.5"></i>
+                <div class="text-xs font-semibold leading-normal" th:text="${errorMessage}">Đăng ký thất bại!</div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form th:action="@{/register}" method="POST" class="space-y-4">
+            
+            <!-- Họ và Tên Row -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label for="firstName" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Họ</label>
+                    <input type="text" id="firstName" name="firstName" th:value="${firstName}" required placeholder="Nguyễn" 
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all">
+                </div>
+                <div class="space-y-1.5">
+                    <label for="lastName" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Tên</label>
+                    <input type="text" id="lastName" name="lastName" th:value="${lastName}" required placeholder="Văn A" 
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all">
+                </div>
             </div>
 
-            <!-- Form Đăng ký -->
-            <form th:action="@{/register}" method="POST">
-                
-                <div class="row">
-                    <!-- Họ -->
-                    <div class="col-md-6 mb-3">
-                        <label for="firstName" class="form-label fw-semibold text-secondary">Họ</label>
-                        <input type="text" id="firstName" name="firstName" th:value="${firstName}"
-                               class="form-control form-control-custom" placeholder="Nguyễn" required>
-                    </div>
-                    <!-- Tên -->
-                    <div class="col-md-6 mb-3">
-                        <label for="lastName" class="form-label fw-semibold text-secondary">Tên</label>
-                        <input type="text" id="lastName" name="lastName" th:value="${lastName}"
-                               class="form-control form-control-custom" placeholder="Văn A" required>
-                    </div>
+            <!-- Username Input -->
+            <div class="space-y-1.5">
+                <label for="username" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Tên Đăng Nhập</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text" id="username" name="username" th:value="${username}" required placeholder="Tối thiểu 3 ký tự..." 
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all">
                 </div>
+            </div>
 
-                <!-- Tài khoản -->
-                <div class="mb-3">
-                    <label for="username" class="form-label fw-semibold text-secondary">Tên Đăng Nhập</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 rounded-start-3" style="border: 1.5px solid #e2e8f0;">
-                            <i class="bi bi-person text-muted"></i>
-                        </span>
-                        <input type="text" id="username" name="username" th:value="${username}"
-                               class="form-control form-control-custom border-start-0 rounded-end-3" 
-                               placeholder="Tối thiểu 3 ký tự" required>
-                    </div>
+            <!-- Email Input -->
+            <div class="space-y-1.5">
+                <label for="email" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                    </span>
+                    <input type="email" id="email" name="email" th:value="${email}" required placeholder="Viết địa chỉ email của bạn..." 
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all">
                 </div>
+            </div>
 
-                <!-- Mật khẩu -->
-                <div class="mb-4">
-                    <label for="password" class="form-label fw-semibold text-secondary">Mật Khẩu</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 rounded-start-3" style="border: 1.5px solid #e2e8f0;">
-                            <i class="bi bi-shield-lock text-muted"></i>
-                        </span>
-                        <input type="password" id="password" name="password" 
-                               class="form-control form-control-custom border-start-0 rounded-end-3" 
-                               placeholder="Tối thiểu 8 ký tự" required>
-                    </div>
+            <!-- Password Input -->
+            <div class="space-y-1.5">
+                <label for="password" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Mật Khẩu</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <i data-lucide="lock" class="w-4 h-4"></i>
+                    </span>
+                    <input type="password" id="password" name="password" required placeholder="Tối thiểu 8 ký tự..." 
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all">
                 </div>
+            </div>
 
-                <!-- Nút Đăng ký -->
-                <button type="submit" class="btn btn-register mb-3">
-                    Đăng Ký Tài Khoản <i class="bi bi-person-plus-fill ms-2"></i>
-                </button>
+            <!-- Submit Button -->
+            <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-white font-bold p-3.5 rounded-xl text-sm transition-all duration-200 shadow-md shadow-primary/10 flex items-center justify-center space-x-2 cursor-pointer pt-3">
+                <span>Đăng Ký Tài Khoản</span>
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+            </button>
+        </form>
 
-                <!-- Liên kết quay lại Login -->
-                <div class="text-center mt-3">
-                    <a href="/login" class="btn-link-custom d-inline-flex align-items-center small">
-                        Đã có tài khoản? Đăng nhập ngay
-                    </a>
-                </div>
-                
-            </form>
+        <!-- Footer links -->
+        <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col items-center space-y-3">
+            <a href="/login" class="text-xs text-slate-500 hover:text-primary transition-colors font-semibold flex items-center space-x-1.5">
+                <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                <span>Đã có tài khoản? Đăng nhập ngay</span>
+            </a>
+            <a href="/books" class="text-xs text-slate-400 hover:text-slate-600 transition-colors font-semibold flex items-center space-x-1.5">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                <span>Quay lại trang chủ</span>
+            </a>
         </div>
     </div>
 
+    <!-- Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 package com.example.bookstore.config;
 
 
-import com.example.bookstore.dto.ApiResponse;
+import com.example.bookstore.common.ApiResponse;
 import com.example.bookstore.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

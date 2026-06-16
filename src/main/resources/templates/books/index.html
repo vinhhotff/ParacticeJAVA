@@ -4,202 +4,527 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thư Viện Số - Bookstore</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    
+    <title>Explore Catalog - BookFlow</title>
+    <!-- CSRF Metadata for AJAX requests -->
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // Indigo-600
+                        primaryHover: '#4338CA', // Indigo-700
+                        bgSlate: '#F8FAFC',
+                        cardBg: '#FFFFFF',
+                        borderSlate: '#E2E8F0',
+                        emeraldAccent: '#10B981',
+                        amberAccent: '#F59E0B',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;850&amp;display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A; /* slate-900 */
+            scroll-behavior: smooth;
         }
-        .navbar-brand {
-            font-weight: 700;
-            letter-spacing: -0.5px;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .hero-section {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            color: white;
-            border-radius: 20px;
-            padding: 3rem 2rem;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.15);
+        ::-webkit-scrollbar-track {
+            background: #F8FAFC;
         }
-        .category-item {
-            transition: all 0.2s ease;
-            border-radius: 8px;
-            font-weight: 500;
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
         }
-        .category-item:hover, .category-item.active {
-            background-color: #e0e7ff !important;
-            color: #4f46e5 !important;
-            transform: translateX(5px);
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
         }
-        .book-card {
-            border: none;
-            border-radius: 16px;
-            background-color: white;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-            height: 100%;
-        }
-        .book-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-        }
-        .book-price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #4f46e5;
-        }
-        .btn-primary-custom {
-            background-color: #4f46e5;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            padding: 0.6rem 1.2rem;
-            transition: all 0.2s;
-        }
-        .btn-primary-custom:hover {
-            background-color: #4338ca;
-            transform: scale(1.02);
+        .active-tab {
+            background-color: #EEF2FF; /* Indigo-50 */
+            border-color: #6366F1;
+            color: #4F46E5;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex antialiased">
 
-    <!-- Header Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3 sticky-top">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="/books">
-                <i class="bi bi-book-half text-primary me-2 fs-3"></i>
-                <span>THƯ VIỆN SỐ</span>
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-borderSlate flex flex-col justify-between p-6 transition-transform duration-300 -translate-x-full md:translate-x-0 shadow-sm">
+        <div class="space-y-8">
+            <!-- Brand Logo -->
+            <a href="/" class="flex items-center space-x-3 cursor-pointer">
+                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-md shadow-primary/20">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-lg font-bold tracking-tight text-slate-900">Book<span class="text-primary">Flow</span></span>
+                    <span class="block text-[10px] text-slate-400 uppercase tracking-widest font-black">Subscription</span>
+                </div>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-span"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/books"><i class="bi bi-house-door-fill me-1"></i>Trang Chủ</a>
-                    </li>
-                    
-                    <!-- Hiển thị khi người dùng đã đăng nhập -->
-                    <li class="nav-item ms-3" sec:authorize="isAuthenticated()">
-                        <span class="navbar-text text-white me-3">
-                            <i class="bi bi-user-fill me-1"></i>Chào, <strong sec:authentication="name">User</strong>
-                        </span>
-                    </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="btn btn-outline-danger btn-sm rounded-pill px-3" href="/logout">
-                            <i class="bi bi-box-arrow-right me-1"></i>Đăng xuất
-                        </a>
-                    </li>
-                    
-                    <!-- Hiển thị khi chưa đăng nhập -->
-                    <li class="nav-item ms-3" sec:authorize="!isAuthenticated()">
-                        <a class="btn btn-outline-primary btn-sm rounded-pill px-4" href="/login">
-                            <i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Main Content Container -->
-    <div class="container my-4">
-        
-        <!-- Hero Section Banner -->
-        <div class="hero-section text-center text-md-start d-flex flex-column flex-md-row align-items-center justify-content-between">
-            <div class="mb-3 mb-md-0">
-                <h1 class="display-5 fw-bold mb-2">Thư Viện Số Hiện Đại</h1>
-                <p class="lead mb-0">Tra cứu sách nhanh chóng, đặt mua tiện lợi chỉ với vài cú click chuột.</p>
-            </div>
-            <div>
-                <i class="bi bi-bookmark-star-fill display-1 text-warning opacity-75"></i>
-            </div>
+            <!-- Navigation Links -->
+            <nav class="space-y-1">
+                <a href="/" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all cursor-pointer">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/books" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-semibold text-sm transition-all cursor-pointer">
+                    <i data-lucide="library" class="w-4 h-4"></i>
+                    <span>Explore Catalog</span>
+                </a>
+                <a href="/books/my-orders" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all cursor-pointer">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                    <span>My Orders</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all cursor-pointer">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Account Settings</span>
+                </a>
+            </nav>
         </div>
 
-        <div class="row">
-            <!-- Sidebar: Thể loại -->
-            <div class="col-lg-3 mb-4">
-                <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
-                    <h5 class="fw-bold mb-3 d-flex align-items-center">
-                        <i class="bi bi-grid-fill text-primary me-2"></i>
-                        <span>Thể Loại Sách</span>
-                    </h5>
-                    <div class="list-group list-group-flush">
-                        <a href="/books" class="list-group-item list-group-item-action border-0 py-2.5 px-3 category-item active">
-                            <i class="bi bi-chevron-right me-2 small"></i>Tất cả sách
-                        </a>
-                        <a th:each="cat : ${categories}" 
-                           th:href="@{'/books/categories/' + ${cat.id}}" 
-                           class="list-group-item list-group-item-action border-0 py-2.5 px-3 category-item">
-                            <i class="bi bi-chevron-right me-2 small"></i>
-                            <span th:text="${cat.name}">Thể loại</span>
-                        </a>
+        <!-- User Profile Bottom Area -->
+        <div class="border-t border-borderSlate pt-6">
+            <div class="flex items-center justify-between">
+                <!-- Logged in user info -->
+                <div class="flex items-center space-x-3" sec:authorize="isAuthenticated()">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-[#818CF8] flex items-center justify-center font-bold text-white shadow-sm">
+                        <span th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">U</span>
+                    </div>
+                    <div class="truncate max-w-[120px]">
+                        <span class="block text-sm font-semibold text-slate-800" sec:authentication="name">User</span>
+                        <span class="block text-xs text-primary font-bold">Member</span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Content Area: Danh sách sách -->
-            <div class="col-lg-9">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="fw-bold m-0">📚 Danh Sách Tác Phẩm</h4>
-                    <span class="badge bg-secondary px-3 py-2 rounded-pill" th:text="${books.size()} + ' cuốn sách'">0 cuốn</span>
-                </div>
-
-                <!-- Grid hiển thị danh sách sách -->
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <div class="col" th:each="book : ${books}">
-                        <div class="card book-card">
-                            <div class="card-body d-flex flex-column p-4">
-                                <span class="badge bg-light text-primary align-self-start mb-2 px-3 py-2 rounded-pill fw-semibold" 
-                                      th:text="${book.categoryName}">Thể loại</span>
-                                <h5 class="card-title fw-bold text-dark mb-1 text-truncate" th:text="${book.title}">Tên Sách</h5>
-                                <p class="card-text text-muted small mb-3">Tác giả: <strong th:text="${book.author}">Tác giả</strong></p>
-                                
-                                <div class="mt-auto d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <span class="book-price" th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
-                                        <div class="small text-muted mt-1">
-                                            <span th:if="${book.stock > 0}" class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Còn hàng</span>
-                                            <span th:if="${book.stock <= 0}" class="text-danger"><i class="bi bi-x-circle-fill me-1"></i>Hết hàng</span>
-                                        </div>
-                                    </div>
-                                    <a th:href="@{'/books/' + ${book.id}}" class="btn btn-primary-custom text-white">
-                                        Chi tiết <i class="bi bi-arrow-right-short ms-1"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Not logged in user info -->
+                <div class="flex items-center space-x-3" sec:authorize="isAnonymous()">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-semibold text-slate-800">Guest</span>
+                        <a href="/login" class="text-xs text-primary hover:underline font-medium cursor-pointer">Sign In</a>
                     </div>
                 </div>
                 
-                <!-- Khi không có sách nào -->
-                <div class="text-center py-5" th:if="${books.isEmpty()}">
-                    <i class="bi bi-journals display-3 text-muted"></i>
-                    <p class="lead mt-3 text-muted">Hiện tại chưa có cuốn sách nào trong hệ thống.</p>
+                <!-- Logout icon button -->
+                <div sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" class="inline">
+                        <button type="submit" class="text-slate-400 hover:text-red-500 p-2 rounded-lg hover:bg-slate-50 cursor-pointer" title="Log Out">
+                            <i data-lucide="log-out" class="w-5 h-5"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
+    </aside>
+
+    <!-- Mobile Header overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/40 hidden transition-opacity duration-300 md:hidden"></div>
+
+    <!-- Main Content Area -->
+    <div class="flex-grow md:pl-64 flex flex-col min-h-screen">
+        
+        <!-- Top bar -->
+        <header class="h-16 border-b border-borderSlate px-6 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-20">
+            <div class="flex items-center space-x-4">
+                <button id="sidebar-toggle" class="md:hidden text-slate-600 hover:text-slate-900 p-2 rounded-lg hover:bg-slate-50 focus:outline-none cursor-pointer">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <div class="relative max-w-md hidden sm:block">
+                    <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
+                    <input type="text" id="top-search-input" placeholder="Quick search catalog..." class="bg-slate-50 border border-borderSlate rounded-xl pl-10 pr-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary w-80 transition-all">
+                </div>
+            </div>
+
+            <!-- Right controls -->
+            <div class="flex items-center space-x-4">
+                <!-- Database status badge -->
+                <div class="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center space-x-1">
+                    <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                    <span>Connected to Database</span>
+                </div>
+                <!-- Redirect attributes feedback messages -->
+                <div th:if="${successMessage}" class="hidden" id="thymeleaf-success" th:text="${successMessage}"></div>
+                <div th:if="${errorMessage}" class="hidden" id="thymeleaf-error" th:text="${errorMessage}"></div>
+            </div>
+        </header>
+
+        <!-- Catalog Container -->
+        <main class="flex-grow p-6 space-y-6 max-w-7xl mx-auto w-full">
+            
+            <!-- Page Header Controls -->
+            <section class="bg-white rounded-3xl p-6 border border-borderSlate space-y-6 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <h2 class="text-xl font-bold text-slate-900 flex items-center space-x-2">
+                                <i data-lucide="library" class="w-5 h-5 text-primary"></i>
+                                <span>Tác Phẩm Nổi Bật</span>
+                            </h2>
+                            <span class="bg-slate-50 text-slate-600 border border-borderSlate px-3 py-1 rounded-full text-xs font-bold" 
+                                  th:text="${books.size()} + ' cuốn sách'">0 cuốn</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Duyệt danh mục sách, đặt mua trực tiếp hoặc xem chi tiết từng tác phẩm.</p>
+                    </div>
+
+                    <!-- Add Book Button (ADMIN only) -->
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <button onclick="openAddBookModal()" class="bg-primary hover:bg-primaryHover text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-md shadow-primary/10 flex items-center space-x-2">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                            <span>Thêm sách mới</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Filters Tabs (Dynamic URLs) -->
+                <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                    <a href="/books" 
+                       class="px-4 py-2 border rounded-xl text-xs font-semibold hover:border-primary transition-all cursor-pointer" 
+                       th:classappend="${activeCategoryId == null} ? 'active-tab' : 'bg-white text-slate-600 border-borderSlate'">
+                        All Categories
+                    </a>
+                    <th:block th:each="cat : ${categories}">
+                        <a th:href="@{'/books/categories/' + ${cat.id}}" 
+                           class="px-4 py-2 border rounded-xl text-xs font-semibold hover:border-primary transition-all cursor-pointer"
+                           th:classappend="${activeCategoryId == cat.id} ? 'active-tab' : 'bg-white text-slate-600 border-borderSlate'"
+                           th:text="${cat.name}">
+                            Category Name
+                        </a>
+                    </th:block>
+                </div>
+            </section>
+
+            <!-- Book Cards Grid -->
+            <section>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" th:if="${!books.isEmpty()}" id="book-grid">
+                    <th:block th:each="book : ${books}">
+                        <div class="bg-white rounded-2xl p-4 border border-borderSlate flex flex-col justify-between transition-all duration-200 hover:shadow-md hover:border-indigo-100 book-card" 
+                             th:data-category="${book.categoryName}" 
+                             th:data-title="${book.title}">
+                            <div>
+                                <!-- Book Cover Container -->
+                                <a th:href="@{'/books/' + ${book.id}}" class="relative rounded-xl overflow-hidden aspect-[4/5] bg-slate-50 border border-borderSlate flex items-center justify-center mb-4 group cursor-pointer block">
+                                    <i data-lucide="book" class="w-12 h-12 text-slate-300 group-hover:scale-105 transition-transform duration-200"></i>
+                                    <span class="absolute top-2 right-2 bg-indigo-50 text-primary px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase" 
+                                          th:text="${book.categoryName}">Category</span>
+                                </a>
+                                <h4 class="text-sm font-bold text-slate-800 line-clamp-1 hover:text-primary transition-colors">
+                                    <a th:href="@{'/books/' + ${book.id}}" th:text="${book.title}">Book Title</a>
+                                </h4>
+                                <p class="text-xs text-slate-400 mt-1" th:text="${book.author}">Author Name</p>
+                                
+                                <div class="flex items-center space-x-1.5 mt-2">
+                                    <span th:if="${book.stock > 0}" class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full inline-flex items-center">
+                                        <span class="w-1.5 h-1.5 bg-emeraldAccent rounded-full mr-1"></span>
+                                        Còn hàng (<span th:text="${book.stock}">0</span>)
+                                    </span>
+                                    <span th:if="${book.stock <= 0}" class="text-[10px] text-red-500 font-bold bg-red-50 px-2 py-0.5 rounded-full inline-flex items-center">
+                                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1"></span>
+                                        Hết hàng
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Bottom Rent form trigger -->
+                            <div class="mt-4 pt-4 border-t border-borderSlate flex items-center justify-between">
+                                <span class="text-xs text-slate-800 font-bold" th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">150,000 đ</span>
+                                
+                                <div class="flex items-center space-x-1.5">
+                                    <a th:href="@{'/books/' + ${book.id}}" class="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-bold px-3 py-2 rounded-xl border border-borderSlate transition-all cursor-pointer">
+                                        Chi tiết
+                                    </a>
+                                    
+                                    <th:block sec:authorize="isAuthenticated()">
+                                        <form th:action="@{/books/orders}" method="post" class="inline">
+                                            <input type="hidden" name="bookId" th:value="${book.id}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <!-- Show rent if stock available, else out of stock -->
+                                            <button th:if="${book.stock > 0}" type="submit" class="bg-primary hover:bg-primaryHover text-white text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer shadow-sm">
+                                                Rent
+                                            </button>
+                                            <button th:if="${book.stock <= 0}" type="button" disabled class="bg-slate-100 text-slate-400 text-xs font-bold px-3 py-2 rounded-xl cursor-not-allowed">
+                                                Rent
+                                            </button>
+                                        </form>
+                                    </th:block>
+                                    <th:block sec:authorize="isAnonymous()">
+                                        <a href="/login" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer">
+                                            Rent
+                                        </a>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+
+                <!-- Empty State (No Books) -->
+                <div class="p-12 text-center border border-dashed border-borderSlate bg-white rounded-3xl" th:if="${books.isEmpty()}">
+                    <div class="w-16 h-16 bg-slate-50 border border-borderSlate rounded-2xl flex items-center justify-center text-slate-300 mx-auto mb-4">
+                        <i data-lucide="book-dashed" class="w-8 h-8"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-800 mb-2">Thư viện đang được cập nhật</h4>
+                    <p class="text-xs text-slate-500 max-w-xs mx-auto mb-4">
+                        Hiện tại chưa có cuốn sách nào trong danh mục này. Vui lòng quay lại sau hoặc liên hệ Admin để cập nhật.
+                    </p>
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <button onclick="openAddBookModal()" class="bg-primary hover:bg-primaryHover text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-md shadow-primary/10">
+                            Thêm cuốn sách đầu tiên
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white text-slate-400 py-8 px-6 border-t border-borderSlate text-center mt-12">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 text-xs">
+                <p>&copy; 2026 BookFlow Subscription Platform. Fully integrated backend.</p>
+                <div class="flex space-x-6">
+                    <a href="/books" class="hover:text-slate-600 transition-colors cursor-pointer">Public Catalog</a>
+                    <a href="/books/my-orders" class="hover:text-slate-600 transition-colors cursor-pointer">My Orders</a>
+                    <a href="#" class="hover:text-slate-600 transition-colors cursor-pointer">Terms &amp; API</a>
+                </div>
+            </div>
+        </footer>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container text-center">
-            <p class="mb-1">&copy; 2026 Thư Viện Số - Bookstore. All Rights Reserved.</p>
-            <small class="text-muted">Được xây dựng trên nền tảng Spring Boot & Thymeleaf</small>
-        </div>
-    </footer>
+    <!-- Add Book Modal Overlay (ADMIN only) -->
+    <div sec:authorize="hasRole('ADMIN')" id="add-book-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden transition-opacity duration-300 opacity-0">
+        <div class="bg-white rounded-3xl border border-borderSlate w-full max-w-md p-6 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
+            <div class="flex items-center justify-between pb-4 border-b border-borderSlate">
+                <h3 class="font-bold text-slate-900 text-lg flex items-center space-x-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5 text-primary"></i>
+                    <span>Thêm Sách Mới</span>
+                </h3>
+                <button onclick="closeAddBookModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-50 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <form id="add-book-form" class="space-y-4 mt-4">
+                <!-- Title input -->
+                <div>
+                    <label for="modal-book-title" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Tên Sách</label>
+                    <input type="text" id="modal-book-title" required placeholder="Nhập tên sách..." class="w-full bg-slate-50 border border-borderSlate rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-primary transition-all">
+                </div>
+                
+                <!-- Author input -->
+                <div>
+                    <label for="modal-book-author" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Tác Giả</label>
+                    <input type="text" id="modal-book-author" required placeholder="Nhập tên tác giả..." class="w-full bg-slate-50 border border-borderSlate rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-primary transition-all">
+                </div>
 
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <!-- Price and Stock Row -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="modal-book-price" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Đơn Giá (đ)</label>
+                        <input type="number" id="modal-book-price" required min="0" placeholder="150000" class="w-full bg-slate-50 border border-borderSlate rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-primary transition-all">
+                    </div>
+                    <div>
+                        <label for="modal-book-stock" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Số Lượng Kho</label>
+                        <input type="number" id="modal-book-stock" required min="0" placeholder="10" class="w-full bg-slate-50 border border-borderSlate rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-primary transition-all">
+                    </div>
+                </div>
+
+                <!-- Category selection -->
+                <div>
+                    <label for="modal-book-category" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Thể Loại</label>
+                    <select id="modal-book-category" required class="w-full bg-slate-50 border border-borderSlate rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-primary transition-all">
+                        <option value="" disabled selected>Chọn thể loại sách...</option>
+                        <th:block th:each="cat : ${categories}">
+                            <option th:value="${cat.id}" th:text="${cat.name}">Category</option>
+                        </th:block>
+                    </select>
+                </div>
+
+                <div class="flex items-center space-x-3 pt-4 border-t border-borderSlate mt-6 justify-end">
+                    <button type="button" onclick="closeAddBookModal()" class="bg-white hover:bg-slate-50 text-slate-700 border border-borderSlate font-bold px-4 py-2.5 rounded-xl text-sm transition-all duration-200 cursor-pointer">
+                        Hủy Bỏ
+                    </button>
+                    <button type="submit" class="bg-primary hover:bg-primaryHover text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all duration-200 cursor-pointer shadow-md shadow-primary/10">
+                        Thêm Sách
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert / Toast Component -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 bg-white border border-borderSlate rounded-2xl p-4 shadow-xl flex items-start space-x-3 max-w-sm hidden transition-all duration-300 transform translate-y-10 opacity-0">
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-primary flex items-center justify-center shrink-0" id="toast-icon-bg">
+            <i data-lucide="check" class="w-4 h-4" id="toast-icon"></i>
+        </div>
+        <div>
+            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider" id="toast-title">Success</h4>
+            <p class="text-xs text-slate-500 mt-0.5" id="toast-message">Transaction processed successfully.</p>
+        </div>
+    </div>
+
+    <!-- Page Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Mobile Sidebar Toggle
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        if (toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+        if (overlay) overlay.addEventListener('click', toggleSidebar);
+
+        // Search Bar Filtering Logic (Filters book cards in real-time)
+        const searchInput = document.getElementById('top-search-input');
+        const bookCards = document.querySelectorAll('.book-card');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                bookCards.forEach(card => {
+                    const title = card.getAttribute('data-title').toLowerCase();
+                    if (title.includes(query)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Modal open/close actions
+        const modal = document.getElementById('add-book-modal');
+        function openAddBookModal() {
+            if (modal) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.querySelector('.transform').classList.remove('scale-95');
+                }, 50);
+            }
+        }
+
+        function closeAddBookModal() {
+            if (modal) {
+                modal.classList.add('opacity-0');
+                modal.querySelector('.transform').classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // Form submission for Add Book (AJAX Fetch API to POST /api/books)
+        const addBookForm = document.getElementById('add-book-form');
+        if (addBookForm) {
+            addBookForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const title = document.getElementById('modal-book-title').value.trim();
+                const author = document.getElementById('modal-book-author').value.trim();
+                const price = parseFloat(document.getElementById('modal-book-price').value);
+                const stock = parseInt(document.getElementById('modal-book-stock').value);
+                const categoryId = parseInt(document.getElementById('modal-book-category').value);
+                
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+                try {
+                    const response = await fetch('/api/books', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify({
+                            title,
+                            author,
+                            price,
+                            stock,
+                            categoryId
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok && data.result) {
+                        closeAddBookModal();
+                        showToast('Thành Công', 'Đã thêm sách mới thành công!', false);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        showToast('Thêm Sách Thất Bại', data.message || 'Lỗi không xác định từ máy chủ.', true);
+                    }
+                } catch (error) {
+                    showToast('Lỗi Kết Nối', 'Không thể kết nối tới server.', true);
+                }
+            });
+        }
+
+        // Feedback toasts handling
+        const successMsgEl = document.getElementById('thymeleaf-success');
+        const errorMsgEl = document.getElementById('thymeleaf-error');
+        
+        function showToast(title, message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMsg = document.getElementById('toast-message');
+            const iconBg = document.getElementById('toast-icon-bg');
+            const icon = document.getElementById('toast-icon');
+
+            toastTitle.textContent = title;
+            toastMsg.textContent = message;
+
+            if (isError) {
+                iconBg.className = "w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0";
+                icon.setAttribute('data-lucide', 'alert-triangle');
+            } else {
+                iconBg.className = "w-8 h-8 rounded-lg bg-indigo-50 text-primary flex items-center justify-center shrink-0";
+                icon.setAttribute('data-lucide', 'check');
+            }
+            lucide.createIcons();
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 5000);
+        }
+
+        if (successMsgEl && successMsgEl.textContent.trim()) {
+            showToast('Đặt Sách Thành Công', successMsgEl.textContent.trim(), false);
+        }
+        if (errorMsgEl && errorMsgEl.textContent.trim()) {
+            showToast('Lỗi Đặt Sách', errorMsgEl.textContent.trim(), true);
+        }
+    </script>
 </body>
 </html>
