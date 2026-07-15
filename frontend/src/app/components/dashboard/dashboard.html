@@ -1,7 +1,9 @@
 <div class="dashboard-container animate-fade-in">
   <header class="header">
-    <h1>Dashboard</h1>
-    <p>Resource Allocation & Workload Monitoring Panel</p>
+    <div class="title-area">
+      <h1>Dashboard</h1>
+      <p class="subtitle">Resource Allocation & Workload Monitoring Panel</p>
+    </div>
   </header>
 
   <!-- Loading State -->
@@ -10,42 +12,42 @@
     <p>Synchronizing data from RAMS backend...</p>
   </div>
 
-  <div *ngIf="!loading()">
-    <!-- Metrics Grid -->
-    <div class="stats-grid">
-      <div class="glass-card stat-card">
-        <div class="stat-icon-wrapper blue">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <h3>Total Employees</h3>
-          <p class="stat-number">{{ totalEmployees() }}</p>
-        </div>
-      </div>
-
-      <div class="glass-card stat-card">
-        <div class="stat-icon-wrapper purple">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <h3>Active Projects</h3>
-          <p class="stat-number">{{ totalProjects() }}</p>
+  <div *ngIf="!loading()" class="dashboard-content">
+    <!-- Premium Bento Stats Grid -->
+    <div class="bento-grid">
+      <!-- Total Employees Card -->
+      <div class="bento-card employee-card glass-panel">
+        <div class="card-inner">
+          <div class="card-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="card-label">Total Resources</span>
+            <i class="fa-solid fa-users text-primary" style="font-size: 1.2rem; opacity: 0.8;"></i>
+          </div>
+          <h2 class="large-metric">{{ totalEmployees() }}</h2>
+          <span class="card-hint">Active personnel registered</span>
         </div>
       </div>
 
-      <div class="glass-card stat-card">
-        <div class="stat-icon-wrapper green">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
-            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-          </svg>
+      <!-- Active Projects Card -->
+      <div class="bento-card project-card glass-panel">
+        <div class="card-inner">
+          <div class="card-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="card-label">Active Projects</span>
+            <i class="fa-solid fa-folder-tree text-info" style="font-size: 1.2rem; opacity: 0.8;"></i>
+          </div>
+          <h2 class="large-metric highlight-primary">{{ totalProjects() }}</h2>
+          <span class="card-hint">Currently active scope</span>
         </div>
-        <div class="stat-content">
-          <h3>Allocations</h3>
-          <p class="stat-number">{{ totalAllocations() }}</p>
+      </div>
+
+      <!-- Allocations Card -->
+      <div class="bento-card allocation-card glass-panel">
+        <div class="card-inner">
+          <div class="card-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="card-label">Allocations</span>
+            <i class="fa-solid fa-circle-nodes text-success" style="font-size: 1.2rem; opacity: 0.8;"></i>
+          </div>
+          <h2 class="large-metric highlight-success">{{ totalAllocations() }}</h2>
+          <span class="card-hint">Total project assignments</span>
         </div>
       </div>
     </div>
@@ -53,12 +55,16 @@
     <!-- Reports Layout -->
     <div class="reports-grid">
       <!-- Utilization Report -->
-      <section class="glass-panel report-section">
-        <h2>Employee Utilization</h2>
+      <section class="glass-panel report-section utilization-panel">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-chart-simple" style="margin-right: 8px; color: var(--primary);"></i>Resource Workload Index</h2>
+          <p class="section-desc">Active allocation ratios per employee</p>
+        </div>
         <div class="report-list">
-          <div *ngFor="let item of utilizationReport() | slice:0:5" class="utilization-item">
+          <div *ngFor="let item of utilizationReport() | slice:0:6" class="utilization-item">
             <div class="item-header">
-              <span class="emp-name">{{ item.fullName }} ({{ item.employeeCode }})</span>
+              <span class="emp-name">{{ item.fullName }}</span>
+              <span class="emp-code">{{ item.employeeCode }}</span>
               <span class="emp-val" [class.danger]="item.totalAllocation > 90">{{ item.totalAllocation }}%</span>
             </div>
             <div class="progress-bar-bg">
@@ -74,13 +80,13 @@
       <!-- Alert Panel (Overloaded & Available) -->
       <div class="alerts-column">
         <!-- Overloaded Employees -->
-        <section class="glass-panel report-section border-danger">
-          <h2 class="title-danger">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="alert-icon">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-            Overloaded (>90%)
-          </h2>
+        <section class="glass-panel report-section alert-panel-danger">
+          <div class="section-header">
+            <h2 class="title-danger">
+              <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>Overload Alerts
+            </h2>
+            <p class="section-desc">Resources exceeding 90% allocation limit</p>
+          </div>
           <div class="overload-list">
             <div *ngFor="let item of overloadedReport()" class="overload-card animate-fade-in">
               <div class="overload-info">
@@ -89,13 +95,18 @@
               </div>
               <div class="overload-badge">{{ item.totalAllocation }}%</div>
             </div>
-            <div *ngIf="overloadedReport().length === 0" class="empty-state green-text">All employees are within safe workload levels.</div>
+            <div *ngIf="overloadedReport().length === 0" class="empty-state-neutral">All personnel are operating within safe capacity limits.</div>
           </div>
         </section>
 
         <!-- Available Resources -->
-        <section class="glass-panel report-section border-success">
-          <h2 class="title-success">Available Bench</h2>
+        <section class="glass-panel report-section alert-panel-success">
+          <div class="section-header">
+            <h2 class="title-success">
+              <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i>Available Bench
+            </h2>
+            <p class="section-desc">Available talent for direct assignment</p>
+          </div>
           <div class="bench-list">
             <div *ngFor="let item of availableReport() | slice:0:4" class="bench-item">
               <div class="bench-info">
@@ -104,7 +115,7 @@
               </div>
               <div class="bench-badge">{{ item.availablePercent }}% free</div>
             </div>
-            <div *ngIf="availableReport().length === 0" class="empty-state">No bench resources available.</div>
+            <div *ngIf="availableReport().length === 0" class="empty-state-neutral">No available bench resources.</div>
           </div>
         </section>
       </div>

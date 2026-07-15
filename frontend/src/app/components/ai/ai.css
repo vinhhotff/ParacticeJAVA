@@ -1,7 +1,7 @@
 .ai-container {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 32px;
 }
 
 .header h1 {
@@ -11,6 +11,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 6px;
+  letter-spacing: -0.5px;
 }
 
 .header p {
@@ -20,38 +21,42 @@
 
 .ai-grid {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: 1fr 1.3fr;
   gap: 24px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 950px) {
   .ai-grid {
     grid-template-columns: 1fr;
   }
 }
 
 .panel-section {
-  padding: 24px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .panel-section h2 {
   font-size: 1.25rem;
   font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.3px;
 }
 
 .section-desc {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .search-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 24px;
 }
 
 .form-group {
@@ -61,8 +66,9 @@
 }
 
 .form-group label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
+  font-weight: 500;
 }
 
 .form-group input {
@@ -74,23 +80,29 @@
   font-family: inherit;
   font-size: 0.9rem;
   outline: none;
+  transition: all 0.2s ease;
 }
 
-/* Slider */
+.form-group input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+}
+
+/* Elegant Slider */
 .slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 3px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
   outline: none;
-  margin: 10px 0;
+  margin: 12px 0;
 }
 
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--primary);
   cursor: pointer;
@@ -99,7 +111,7 @@
 }
 
 .slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
+  transform: scale(1.15);
 }
 
 .btn-block {
@@ -113,14 +125,14 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  padding: 30px;
+  padding: 40px 0;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .spinner {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: 2px solid rgba(129, 140, 248, 0.1);
   border-top-color: var(--primary);
   border-radius: 50%;
@@ -133,14 +145,16 @@
 
 /* Results output */
 .results-area {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .results-title {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .recs-list {
@@ -151,20 +165,27 @@
 
 .rec-card {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.01);
   border: 1px solid var(--glass-border);
   border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.rec-card:hover {
+  border-color: var(--glass-highlight);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .rec-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .rec-header strong {
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
+  color: #fff;
 }
 
 .rec-header span {
@@ -174,25 +195,25 @@
 
 .rec-body {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .role-pill {
-  background: rgba(129, 140, 248, 0.1);
-  border: 1px solid rgba(129, 140, 248, 0.15);
+  background: rgba(129, 140, 248, 0.05);
+  border: 1px solid rgba(129, 140, 248, 0.1);
   color: var(--primary);
-  padding: 2px 8px;
-  border-radius: 6px;
+  padding: 3px 8px;
+  border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 500;
 }
 
 .capacity-pill {
-  background: rgba(52, 211, 153, 0.1);
-  border: 1px solid rgba(52, 211, 153, 0.15);
+  background: rgba(52, 211, 153, 0.05);
+  border: 1px solid rgba(52, 211, 153, 0.1);
   color: var(--success);
-  padding: 2px 8px;
-  border-radius: 6px;
+  padding: 3px 8px;
+  border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 500;
 }
@@ -205,59 +226,60 @@
 }
 
 .risk-card {
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid transparent;
+  padding: 18px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--glass-border);
 }
 
 .risk-high {
-  background: rgba(248, 113, 113, 0.06);
-  border-color: rgba(248, 113, 113, 0.15);
+  border-left: 3px solid var(--danger);
+  background: rgba(248, 113, 113, 0.02);
 }
 
 .risk-high .risk-badge {
-  background: var(--danger);
-  color: #fff;
-  box-shadow: 0 0 10px var(--danger-glow);
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.15);
+  color: var(--danger);
 }
 
 .risk-high .level-indicator {
-  background: rgba(248, 113, 113, 0.12);
+  background: rgba(248, 113, 113, 0.05);
   color: var(--danger);
 }
 
 .risk-medium {
-  background: rgba(251, 191, 36, 0.06);
-  border-color: rgba(251, 191, 36, 0.15);
+  border-left: 3px solid var(--warning);
+  background: rgba(251, 191, 36, 0.02);
 }
 
 .risk-medium .risk-badge {
-  background: var(--warning);
-  color: var(--text-dark);
-  box-shadow: 0 0 10px var(--warning-glow);
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+  color: var(--warning);
 }
 
 .risk-medium .level-indicator {
-  background: rgba(251, 191, 36, 0.12);
+  background: rgba(251, 191, 36, 0.05);
   color: var(--warning);
 }
 
 .risk-low {
-  background: rgba(52, 211, 153, 0.06);
-  border-color: rgba(52, 211, 153, 0.15);
+  border-left: 3px solid var(--success);
+  background: rgba(52, 211, 153, 0.02);
 }
 
 .risk-low .risk-badge {
-  background: var(--success);
-  color: var(--text-dark);
-  box-shadow: 0 0 10px var(--success-glow);
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.15);
+  color: var(--success);
 }
 
 .risk-low .level-indicator {
-  background: rgba(52, 211, 153, 0.12);
+  background: rgba(52, 211, 153, 0.05);
   color: var(--success);
 }
 
@@ -274,8 +296,9 @@
 }
 
 .risk-meta strong {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #fff;
 }
 
 .risk-meta span {
@@ -284,25 +307,26 @@
 }
 
 .risk-badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .risk-body p {
   font-size: 0.88rem;
-  color: var(--text-main);
+  color: var(--text-muted);
   line-height: 1.4;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .level-indicator {
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
   letter-spacing: 0.5px;
 }
 
@@ -310,5 +334,5 @@
   font-size: 0.85rem;
   color: var(--text-muted);
   text-align: center;
-  padding: 16px;
+  padding: 24px 0;
 }

@@ -12,3 +12,8 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+
+# Embedding service URL for docker environment
+embedding:
+  service:
+    url: http://embedding-service:5000

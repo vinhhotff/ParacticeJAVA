@@ -9,6 +9,7 @@ import org.example.homework.service.AllocationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/allocations")
@@ -17,6 +18,20 @@ import org.springframework.web.bind.annotation.*;
 public class AllocationController {
 
     private final AllocationService allocationService;
+
+    @GetMapping
+    public ResponseEntity<List<AllocationResponse>> getAll() {
+        log.info("Get all allocations request");
+        List<AllocationResponse> response = allocationService.getAll();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AllocationResponse> getById(@PathVariable Long id) {
+        log.info("Get allocation request: {}", id);
+        AllocationResponse response = allocationService.getById(id);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     public ResponseEntity<AllocationResponse> create(@RequestBody @Valid AllocationRequest request) {

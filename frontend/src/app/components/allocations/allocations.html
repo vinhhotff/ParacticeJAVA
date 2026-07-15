@@ -5,9 +5,7 @@
       <p>Assign employees to active projects and monitor allocations</p>
     </div>
     <button class="btn btn-primary" (click)="openCreateModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
+      <i class="fa-solid fa-link btn-icon" style="margin-right: 6px;"></i>
       New Allocation
     </button>
   </header>
@@ -32,7 +30,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let alloc of allocations()">
+        <tr *ngFor="let alloc of paginatedAllocations()">
           <td>
             <div class="emp-info">
               <strong>{{ alloc.employeeName }}</strong>
@@ -56,8 +54,8 @@
           <td>{{ alloc.startDate }}</td>
           <td>{{ alloc.endDate || 'Indefinite' }}</td>
           <td class="actions-cell">
-            <button class="btn btn-sm btn-danger" (click)="deleteAllocation(alloc.allocationId!)">
-              End Allocation
+            <button class="btn btn-sm btn-danger" (click)="deleteAllocation(alloc.id!)" style="display: inline-flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-link-slash"></i> End Allocation
             </button>
           </td>
         </tr>
@@ -66,13 +64,28 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-panel" *ngIf="totalPages() > 1" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; border-top: 1px solid var(--glass-border);">
+      <span class="pagination-info" style="font-size: 0.82rem; color: var(--text-muted);">
+        Showing page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong> (Total: {{ allocations().length }} allocations)
+      </span>
+      <div class="pagination-actions" style="display: flex; gap: 8px;">
+        <button type="button" class="btn btn-sm btn-outline" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)" style="padding: 6px 12px; font-size: 0.8rem;">
+          <i class="fa-solid fa-chevron-left" style="margin-right: 4px;"></i> Previous
+        </button>
+        <button type="button" class="btn btn-sm btn-outline" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)" style="padding: 6px 12px; font-size: 0.8rem;">
+          Next <i class="fa-solid fa-chevron-right" style="margin-left: 4px;"></i>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Create Allocation Modal -->
   <div *ngIf="showCreateModal()" class="modal-backdrop" (click)="closeCreateModal()">
     <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>Assign Employee to Project</h2>
+        <h2><i class="fa-solid fa-link" style="margin-right: 8px; color: var(--primary);"></i>Assign Employee to Project</h2>
         <button class="close-btn" (click)="closeCreateModal()">&times;</button>
       </div>
 
@@ -84,7 +97,7 @@
         <div class="form-group">
           <label>Employee</label>
           <select [(ngModel)]="newAllocation().employeeId" name="employeeId" required class="select-field">
-            <option *ngFor="let emp of employees()" [value]="emp.employeeId">
+            <option *ngFor="let emp of employees()" [value]="emp.id">
               {{ emp.fullName }} ({{ emp.employeeCode }} - {{ emp.role }})
             </option>
           </select>
@@ -93,7 +106,7 @@
         <div class="form-group">
           <label>Project</label>
           <select [(ngModel)]="newAllocation().projectId" name="projectId" required class="select-field">
-            <option *ngFor="let proj of projects()" [value]="proj.projectId">
+            <option *ngFor="let proj of projects()" [value]="proj.id">
               {{ proj.projectName }} ({{ proj.projectCode }} - {{ proj.status }})
             </option>
           </select>

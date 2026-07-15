@@ -41,6 +41,20 @@ public class EmployeeController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeeResponse> update(@PathVariable Long id, @RequestBody @Valid EmployeeRequest request) {
+        log.info("Update employee {}: {}", id, request.getEmployeeCode());
+        EmployeeResponse response = employeeService.update(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("Delete employee: {}", id);
+        employeeService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}/workload")
     public ResponseEntity<WorkloadResponse> getWorkload(@PathVariable Long id) {
         log.info("Get employee workload request: {}", id);

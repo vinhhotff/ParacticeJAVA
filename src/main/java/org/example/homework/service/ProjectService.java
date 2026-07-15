@@ -8,4 +8,6 @@ public interface ProjectService {
     ProjectResponse create(ProjectRequest request);
     ProjectResponse findById(Long id);
     List<ProjectResponse> findAll();
+    ProjectResponse update(Long id, ProjectRequest request);
+    void delete(Long id);
 }

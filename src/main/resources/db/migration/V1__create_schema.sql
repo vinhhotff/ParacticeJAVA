@@ -1,18 +1,24 @@
+-- Enable pgvector extension
+CREATE EXTENSION IF NOT EXISTS vector;
+
 CREATE TABLE employee (
     employee_id   BIGSERIAL    PRIMARY KEY,
     employee_code VARCHAR(20)  UNIQUE NOT NULL,
     full_name     VARCHAR(100) NOT NULL,
     email         VARCHAR(100) UNIQUE NOT NULL,
     role          VARCHAR(50)  NOT NULL,
-    department    VARCHAR(50)  NOT NULL
+    department    VARCHAR(50)  NOT NULL,
+    role_embedding vector(384)
 );
 
 COMMENT ON TABLE  employee        IS 'Employee information';
 COMMENT ON COLUMN employee.email  IS 'Company email address';
 COMMENT ON COLUMN employee.role   IS 'Job title / role';
+COMMENT ON COLUMN employee.role_embedding IS 'Vector embedding of employee role for semantic search';
 
 CREATE INDEX idx_employee_department ON employee(department);
 CREATE INDEX idx_employee_role ON employee(role);
+CREATE INDEX idx_employee_role_embedding ON employee USING hnsw (role_embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
 
 CREATE TABLE project (
     project_id   BIGSERIAL    PRIMARY KEY,
@@ -22,10 +28,14 @@ CREATE TABLE project (
     status       VARCHAR(20)  NOT NULL DEFAULT 'PLANNING',
     start_date   DATE,
     end_date     DATE,
+    description_embedding vector(384),
     CONSTRAINT chk_project_status CHECK (status IN ('PLANNING', 'ACTIVE', 'COMPLETED'))
 );
 
 COMMENT ON TABLE project IS 'Project information';
+COMMENT ON COLUMN project.description_embedding IS 'Vector embedding of project description for semantic search';
+
+CREATE INDEX idx_project_description_embedding ON project USING hnsw (description_embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
 
 CREATE TABLE allocation (
     allocation_id      BIGSERIAL    PRIMARY KEY,

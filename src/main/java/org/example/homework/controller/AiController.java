@@ -34,8 +34,10 @@ public class AiController {
     }
 
     @GetMapping("/detect-risks")
-    public ResponseEntity<RiskReport> detectRisks(@RequestParam(required = false) String teamRole) {
-        log.info("AI detect risks request: teamRole={}", teamRole);
-        return ResponseEntity.ok(riskDetectionService.detectRisks(teamRole));
+    public ResponseEntity<RiskReport> detectRisks(
+            @RequestParam(required = false) String teamRole,
+            @RequestParam(required = false) String customPrompt) {
+        log.info("AI detect risks request: teamRole={}, customPrompt={}", teamRole, customPrompt);
+        return ResponseEntity.ok(riskDetectionService.detectRisks(teamRole, customPrompt));
     }
 }

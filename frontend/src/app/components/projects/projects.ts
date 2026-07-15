@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectService } from '../../services/project.service';
@@ -15,6 +15,25 @@ export class Projects implements OnInit {
   protected readonly projects = signal<Project[]>([]);
   protected readonly loading = signal(true);
   protected readonly showCreateModal = signal(false);
+
+  // Pagination
+  protected readonly currentPage = signal(1);
+  protected readonly pageSize = 5;
+  protected readonly paginatedProjects = computed(() => {
+    const total = this.projects().length;
+    const page = Math.min(this.currentPage(), Math.ceil(total / this.pageSize) || 1);
+    const startIndex = (page - 1) * this.pageSize;
+    return this.projects().slice(startIndex, startIndex + this.pageSize);
+  });
+  protected readonly totalPages = computed(() => {
+    return Math.max(1, Math.ceil(this.projects().length / this.pageSize));
+  });
+
+  protected goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
 
   protected readonly newProject = signal<Project>({
     projectCode: '',

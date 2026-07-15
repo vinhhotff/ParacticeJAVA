@@ -1,13 +1,15 @@
 .allocations-container {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 32px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 20px;
 }
 
 .header h1 {
@@ -17,6 +19,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 6px;
+  letter-spacing: -0.5px;
 }
 
 .header p {
@@ -54,48 +57,45 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  border-radius: 10px;
+  padding: 10px 18px;
+  border-radius: 8px;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid transparent;
 }
 
 .btn-primary {
   background: var(--primary);
   color: var(--text-dark);
-  box-shadow: 0 4px 15px var(--primary-glow);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--primary-glow);
-  opacity: 0.9;
+  transform: translateY(-1px);
+  filter: brightness(1.1);
 }
 
 .btn-outline {
   background: transparent;
   border-color: var(--glass-border);
-  color: var(--text-main);
+  color: var(--text-muted);
 }
 
 .btn-outline:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
   border-color: var(--glass-highlight);
+  color: #fff;
 }
 
 .btn-danger {
-  background: rgba(248, 113, 113, 0.12);
-  border: 1px solid rgba(248, 113, 113, 0.25);
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.15);
   color: var(--danger);
 }
 
 .btn-danger:hover {
-  background: var(--danger);
-  color: #fff;
-  box-shadow: 0 4px 12px var(--danger-glow);
+  background: rgba(248, 113, 113, 0.15);
 }
 
 .btn-sm {
@@ -104,39 +104,40 @@
 }
 
 .btn-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 /* Table layout */
 .table-wrapper {
   overflow-x: auto;
-  padding: 12px;
+  border: 1px solid var(--glass-border);
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .data-table th, .data-table td {
-  padding: 16px 20px;
+  padding: 18px 24px;
 }
 
 .data-table th {
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.8rem;
-  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
   border-bottom: 1px solid var(--glass-border);
+  background: rgba(15, 23, 42, 0.2);
 }
 
 .data-table tbody tr {
   border-bottom: 1px solid var(--glass-border);
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .data-table tbody tr:last-child {
@@ -144,7 +145,7 @@
 }
 
 .data-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.015);
 }
 
 .emp-info, .proj-info {
@@ -154,9 +155,8 @@
 }
 
 .emp-info strong, .proj-info strong {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-main);
+  font-weight: 500;
+  color: #fff;
 }
 
 .emp-info span, .proj-info span {
@@ -165,35 +165,35 @@
 }
 
 .role-badge {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--glass-border);
   color: var(--text-muted);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
   font-weight: 500;
 }
 
 /* Percent badges */
 .percent-badge {
-  background: rgba(52, 211, 153, 0.12);
-  border: 1px solid rgba(52, 211, 153, 0.2);
+  background: rgba(52, 211, 153, 0.05);
+  border: 1px solid rgba(52, 211, 153, 0.1);
   color: var(--success);
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .percent-badge.perc-high {
-  background: rgba(251, 191, 36, 0.12);
-  border: 1px solid rgba(251, 191, 36, 0.2);
+  background: rgba(251, 191, 36, 0.05);
+  border: 1px solid rgba(251, 191, 36, 0.1);
   color: var(--warning);
 }
 
 .percent-badge.perc-danger {
-  background: rgba(248, 113, 113, 0.12);
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: rgba(248, 113, 113, 0.05);
+  border: 1px solid rgba(248, 113, 113, 0.1);
   color: var(--danger);
 }
 
@@ -204,26 +204,32 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(2, 6, 17, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(2, 6, 17, 0.8);
+  backdrop-filter: blur(12px);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .modal-content {
   width: 100%;
-  max-width: 480px;
-  padding: 30px;
-  position: relative;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 460px;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes scaleUp {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal-header {
@@ -238,19 +244,21 @@
 .modal-header h2 {
   font-size: 1.3rem;
   font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.3px;
 }
 
 .close-btn {
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   cursor: pointer;
   line-height: 1;
 }
 
 .close-btn:hover {
-  color: var(--text-main);
+  color: #fff;
 }
 
 .modal-form {
@@ -266,8 +274,8 @@
 }
 
 .alert-danger {
-  background: rgba(248, 113, 113, 0.1);
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.15);
   color: var(--danger);
 }
 
@@ -278,8 +286,9 @@
 }
 
 .form-group label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
+  font-weight: 500;
 }
 
 .form-group input, .select-field {
@@ -291,30 +300,30 @@
   font-family: inherit;
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
   width: 100%;
 }
 
 .select-field option {
-  background: #1e1b4b;
+  background: #111827;
   color: #fff;
 }
 
 .form-group input:focus, .select-field:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .empty-state {
   font-size: 0.85rem;
   color: var(--text-muted);
   text-align: center;
-  padding: 16px;
+  padding: 24px;
 }

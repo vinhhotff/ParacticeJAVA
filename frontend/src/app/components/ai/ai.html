@@ -9,41 +9,46 @@
   <div class="ai-grid">
     <!-- Left Column: Resource Finder -->
     <div class="glass-panel panel-section">
-      <h2>AI Resource Matcher</h2>
+      <h2><i class="fa-solid fa-people-arrows" style="margin-right: 8px; color: var(--primary);"></i>AI Resource Matcher</h2>
       <p class="section-desc">Search for available bench resources by role and free capacity thresholds.</p>
-
+ 
       <form (submit)="findRecommendations()" class="search-form">
         <div class="form-group">
           <label>Required Project Role</label>
           <input type="text" [(ngModel)]="searchRole" name="searchRole" required placeholder="e.g. Java, Python, Angular">
         </div>
-
+ 
         <div class="form-group">
           <label>Minimum Available Capacity: <strong>{{ minAvailable() }}%</strong></label>
           <input type="range" [(ngModel)]="minAvailable" name="minAvailable" min="0" max="100" step="5" class="slider">
         </div>
-
-        <button type="submit" class="btn btn-primary btn-block">Find Matching Resources</button>
+ 
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="fa-solid fa-magnifying-glass" style="margin-right: 6px;"></i> Find Matching Resources
+        </button>
       </form>
-
+ 
       <!-- Recommendations Output -->
       <div class="results-area">
         <div *ngIf="loadingRecs()" class="spinner-wrapper">
           <div class="spinner"></div>
           <p>Consulting index database...</p>
         </div>
-
+ 
         <div *ngIf="!loadingRecs() && searchTriggered()">
           <h3 class="results-title">Optimal Matches</h3>
           <div class="recs-list">
             <div *ngFor="let rec of recommendations()" class="rec-card animate-fade-in">
               <div class="rec-header">
-                <strong>{{ rec.fullName }}</strong>
+                <strong>{{ rec.employeeName }}</strong>
                 <span>{{ rec.employeeCode }}</span>
               </div>
-              <div class="rec-body">
+              <div class="rec-body" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <span class="role-pill">{{ rec.role }}</span>
-                <span class="capacity-pill">{{ rec.availablePercent }}% free capacity</span>
+                <span class="capacity-pill">{{ rec.available }}% available</span>
+                <span class="score-pill" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: 6px;">
+                  Score: {{ rec.matchScore }}
+                </span>
               </div>
             </div>
             <div *ngIf="recommendations().length === 0" class="empty-state">
@@ -53,38 +58,96 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Right Column: Project Risks -->
     <div class="glass-panel panel-section">
-      <h2>Project Risk Analysis</h2>
-      <p class="section-desc">Live alert logs identifying project status health and overall team overload indicators.</p>
+      <h2><i class="fa-solid fa-shield-halved" style="margin-right: 8px; color: var(--warning);"></i>Team Risk Analysis</h2>
+      <p class="section-desc">Live alert logs identifying overall team capacity, workload limits and resource risks.</p>
+ 
+      <!-- Custom Analysis Prompt -->
+      <div class="search-form" style="padding-bottom: 12px; margin-bottom: 8px; border-bottom: 1px solid var(--glass-border);">
+        <div class="form-group" style="display: flex; flex-direction: row; gap: 8px; align-items: flex-end;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+            <label style="font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">Custom AI Prompt / Specific Request</label>
+            <input type="text" [(ngModel)]="customPrompt" name="customPrompt" placeholder="e.g. Focus on overloads or check potential Java constraints..." 
+                   (keyup.enter)="loadProjectRisks()" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; height: 38px;">
+          </div>
+          <button (click)="loadProjectRisks()" class="btn btn-primary" style="height: 38px; padding: 0 16px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+            <i class="fa-solid fa-microscope"></i> Analyze
+          </button>
+        </div>
+      </div>
 
       <div *ngIf="loadingRisks()" class="spinner-wrapper">
         <div class="spinner"></div>
         <p>Calculating risk coefficients...</p>
       </div>
 
-      <div *ngIf="!loadingRisks()" class="risks-list">
-        <div *ngFor="let risk of projectRisks()" class="risk-card animate-fade-in"
-             [class.risk-high]="risk.riskLevel === 'HIGH'"
-             [class.risk-medium]="risk.riskLevel === 'MEDIUM'"
-             [class.risk-low]="risk.riskLevel === 'LOW'">
-          <div class="risk-header">
-            <div class="risk-meta">
-              <strong>{{ risk.projectName }}</strong>
-              <span>{{ risk.projectCode }}</span>
+      <div *ngIf="!loadingRisks() && riskReport()">
+        <!-- Summary statement -->
+        <div class="risk-summary" style="padding: 12px 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 8px; margin-bottom: 20px; font-weight: 500; font-size: 0.9rem;">
+          {{ riskReport()!.summary }}
+        </div>
+
+        <div class="risks-list">
+          <div *ngFor="let risk of riskReport()!.risks" class="risk-card animate-fade-in"
+               [class.risk-high]="risk.severity === 'HIGH'"
+               [class.risk-medium]="risk.severity === 'MEDIUM'"
+               [class.risk-low]="risk.severity === 'LOW'">
+            <div class="risk-header">
+              <div class="risk-meta">
+                <strong>{{ risk.type }} Alert</strong>
+              </div>
+              <div class="risk-badge">
+                {{ risk.severity }}
+              </div>
             </div>
-            <div class="risk-badge">
-              Score: {{ risk.riskScore }}
+            <div class="risk-body">
+              <p>{{ risk.message }}</p>
+              <span class="level-indicator">{{ risk.severity }} RISK</span>
             </div>
           </div>
-          <div class="risk-body">
-            <p>{{ risk.riskMessage }}</p>
-            <span class="level-indicator">{{ risk.riskLevel }} RISK</span>
+
+          <div *ngIf="riskReport()!.risks.length === 0" class="empty-state">No team risks currently detected.</div>
+        </div>
+
+        <!-- Workload Summary section -->
+        <div class="workload-summary-section" style="margin-top: 24px;">
+          <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; color: var(--text-muted);">Team Capacity Reference</h3>
+          <div class="workload-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+            <div *ngFor="let item of paginatedWorkloads()" class="workload-item" 
+                 style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 8px; font-size: 0.85rem;">
+              <div>
+                <strong style="color: #fff;">{{ item.employeeName }}</strong>
+              </div>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <span>Total: <strong [style.color]="item.totalAllocation > 90 ? 'var(--danger)' : 'var(--text-main)'">{{ item.totalAllocation }}%</strong></span>
+                <span class="capacity-pill" [style.background]="item.available >= 50 ? 'rgba(52, 211, 153, 0.1)' : 'rgba(248, 113, 113, 0.1)'" 
+                      [style.color]="item.available >= 50 ? 'var(--success)' : 'var(--danger)'"
+                      [style.border]="item.available >= 50 ? '1px solid rgba(52, 211, 153, 0.15)' : '1px solid rgba(248, 113, 113, 0.15)'"
+                      style="font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; font-weight: 500;">
+                  {{ item.available }}% available
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Capacity Pagination Controls -->
+          <div class="pagination-panel" *ngIf="workloadTotalPages() > 1" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-top: 1px solid var(--glass-border);">
+            <span class="pagination-info" style="font-size: 0.78rem; color: var(--text-muted);">
+              Page {{ workloadPage() }} of {{ workloadTotalPages() }} ({{ riskReport()!.workloadSummary.length }} resources)
+            </span>
+            <div class="pagination-actions" style="display: flex; gap: 6px;">
+              <button type="button" class="btn btn-sm btn-outline" [disabled]="workloadPage() === 1" (click)="goToWorkloadPage(workloadPage() - 1)" style="padding: 4px 8px; font-size: 0.75rem; height: auto;">
+                <i class="fa-solid fa-chevron-left" style="margin-right: 4px;"></i> Prev
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" [disabled]="workloadPage() === workloadTotalPages()" (click)="goToWorkloadPage(workloadPage() + 1)" style="padding: 4px 8px; font-size: 0.75rem; height: auto;">
+                Next <i class="fa-solid fa-chevron-right" style="margin-left: 4px;"></i>
+              </button>
+            </div>
           </div>
         </div>
 
-        <div *ngIf="projectRisks().length === 0" class="empty-state">No projects currently analyzed.</div>
       </div>
     </div>
   </div>

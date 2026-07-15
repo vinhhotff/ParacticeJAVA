@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ResourceRecommendation, ProjectRisk } from '../models';
+import { ResourceRecommendation, RiskReport } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +15,14 @@ export class AiService {
     const params = new HttpParams()
       .set('role', role)
       .set('minAvailable', minAvailable.toString());
-    return this.http.get<ResourceRecommendation[]>(`${this.baseUrl}/recommendations`, { params });
+    return this.http.get<ResourceRecommendation[]>(`${this.baseUrl}/recommend-resources`, { params });
   }
 
-  getProjectRisks(): Observable<ProjectRisk[]> {
-    return this.http.get<ProjectRisk[]>(`${this.baseUrl}/risks`);
+  getProjectRisks(customPrompt?: string): Observable<RiskReport> {
+    let params = new HttpParams();
+    if (customPrompt) {
+      params = params.set('customPrompt', customPrompt);
+    }
+    return this.http.get<RiskReport>(`${this.baseUrl}/detect-risks`, { params });
   }
 }

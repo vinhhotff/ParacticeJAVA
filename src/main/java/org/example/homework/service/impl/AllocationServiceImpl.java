@@ -17,6 +17,8 @@ import org.example.homework.service.AllocationService;
 import org.example.homework.validator.AllocationValidationOrchestrator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,24 @@ public class AllocationServiceImpl implements AllocationService {
     private final EmployeeRepository employeeRepository;
     private final ProjectRepository projectRepository;
     private final AllocationValidationOrchestrator validationOrchestrator;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AllocationResponse> getAll() {
+        log.info("Get all allocations request");
+        return allocationRepository.findAll().stream()
+            .map(this::toResponse)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AllocationResponse getById(Long id) {
+        log.info("Get allocation by id: {}", id);
+        Allocation allocation = allocationRepository.findById(id)
+            .orElseThrow(() -> new AllocationNotFoundException(id));
+        return toResponse(allocation);
+    }
 
     @Override
     @Transactional
@@ -104,7 +124,11 @@ public class AllocationServiceImpl implements AllocationService {
         return AllocationResponse.builder()
             .id(entity.getAllocationId())
             .employeeId(entity.getEmployee().getEmployeeId())
+            .employeeCode(entity.getEmployee().getEmployeeCode())
+            .employeeName(entity.getEmployee().getFullName())
             .projectId(entity.getProject().getProjectId())
+            .projectCode(entity.getProject().getProjectCode())
+            .projectName(entity.getProject().getProjectName())
             .allocationPercent(entity.getAllocationPercent())
             .roleInProject(entity.getRoleInProject())
             .startDate(entity.getStartDate())

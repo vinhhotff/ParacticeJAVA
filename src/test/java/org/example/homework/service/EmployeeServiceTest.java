@@ -26,6 +26,9 @@ class EmployeeServiceTest {
     @Mock
     private AllocationRepository allocationRepository;
 
+    @Mock
+    private org.example.homework.embedding.EmbeddingServiceClient embeddingServiceClient;
+
     @InjectMocks
     private EmployeeServiceImpl employeeService;
 
@@ -50,6 +53,7 @@ class EmployeeServiceTest {
 
         when(employeeRepository.existsByEmployeeCode("EMP001")).thenReturn(false);
         when(employeeRepository.existsByEmail("john@doe.com")).thenReturn(false);
+        when(embeddingServiceClient.generateEmbedding("Dev")).thenReturn(new float[384]);
         when(employeeRepository.save(any(Employee.class))).thenReturn(employee);
 
         EmployeeResponse response = employeeService.create(request);

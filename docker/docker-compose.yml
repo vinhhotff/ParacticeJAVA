@@ -13,13 +13,45 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/resource_allocation
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      EMBEDDING_SERVICE_URL: http://embedding-service:5000
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     depends_on:
       db:
         condition: service_healthy
+      embedding-service:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: resource-allocation-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  embedding-service:
+    build:
+      context: ../embedding-service
+      dockerfile: Dockerfile
+    container_name: resource-allocation-embedding
+    ports:
+      - "5001:5000"
+    environment:
+      EMBEDDING_MODEL: all-MiniLM-L6-v2
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
     restart: unless-stopped
 
   db:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: resource-allocation-db
     ports:
       - "5432:5432"

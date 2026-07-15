@@ -19,8 +19,7 @@
 }
 
 .brand-icon {
-  width: 32px;
-  height: 32px;
+  font-size: 1.8rem;
   color: var(--primary);
   filter: drop-shadow(0 0 8px var(--primary-glow));
 }
@@ -65,8 +64,11 @@
 }
 
 .icon {
-  width: 20px;
-  height: 20px;
+  font-size: 1.25rem;
+  width: 24px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .sidebar-footer {

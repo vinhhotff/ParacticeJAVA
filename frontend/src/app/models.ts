@@ -1,31 +1,31 @@
 export interface Employee {
-  employeeId?: number;
-  employeeCode: String;
-  fullName: String;
-  email: String;
-  role: String;
-  department: String;
+  id?: number;
+  employeeCode: string;
+  fullName: string;
+  email: string;
+  role: string;
+  department: string;
 }
 
 export interface EmployeeWorkload {
   employeeId: number;
-  employeeCode: string;
-  fullName: string;
+  employeeName: string;
   totalAllocation: number;
+  available: number;
 }
 
 export interface Project {
-  projectId?: number;
-  projectCode: String;
-  projectName: String;
-  customer: String;
-  status: String;
-  startDate: String;
-  endDate?: String;
+  id?: number;
+  projectCode: string;
+  projectName: string;
+  customer: string;
+  status: string;
+  startDate: string;
+  endDate?: string;
 }
 
 export interface Allocation {
-  allocationId?: number;
+  id?: number;
   employeeId: number;
   employeeCode?: string;
   employeeName?: string;
@@ -62,16 +62,20 @@ export interface OverloadedEmployeeItem {
 export interface ResourceRecommendation {
   employeeId: number;
   employeeCode: string;
-  fullName: string;
+  employeeName: string;
   role: string;
-  availablePercent: number;
+  available: number;
+  matchScore: number;
 }
 
-export interface ProjectRisk {
-  projectId: number;
-  projectCode: string;
-  projectName: string;
-  riskScore: number;
-  riskLevel: string;
-  riskMessage: string;
+export interface Risk {
+  type: string;
+  severity: string;
+  message: string;
+}
+
+export interface RiskReport {
+  risks: Risk[];
+  summary: string;
+  workloadSummary: EmployeeWorkload[];
 }

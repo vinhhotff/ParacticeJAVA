@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllocationService } from '../../services/allocation.service';
@@ -20,6 +20,25 @@ export class Allocations implements OnInit {
   protected readonly projects = signal<Project[]>([]);
   protected readonly loading = signal(true);
   protected readonly showCreateModal = signal(false);
+
+  // Pagination
+  protected readonly currentPage = signal(1);
+  protected readonly pageSize = 5;
+  protected readonly paginatedAllocations = computed(() => {
+    const total = this.allocations().length;
+    const page = Math.min(this.currentPage(), Math.ceil(total / this.pageSize) || 1);
+    const startIndex = (page - 1) * this.pageSize;
+    return this.allocations().slice(startIndex, startIndex + this.pageSize);
+  });
+  protected readonly totalPages = computed(() => {
+    return Math.max(1, Math.ceil(this.allocations().length / this.pageSize));
+  });
+
+  protected goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
 
   protected readonly newAllocation = signal<any>({
     employeeId: null,
@@ -63,8 +82,8 @@ export class Allocations implements OnInit {
 
   openCreateModal(): void {
     this.newAllocation.set({
-      employeeId: this.employees().length > 0 ? this.employees()[0].employeeId : null,
-      projectId: this.projects().length > 0 ? this.projects()[0].projectId : null,
+      employeeId: this.employees().length > 0 ? this.employees()[0].id : null,
+      projectId: this.projects().length > 0 ? this.projects()[0].id : null,
       allocationPercent: 50,
       roleInProject: '',
       startDate: new Date().toISOString().substring(0, 10),
@@ -107,7 +126,7 @@ export class Allocations implements OnInit {
     if (confirm('Are you sure you want to end this project allocation?')) {
       this.allocationService.delete(id).subscribe({
         next: () => {
-          this.allocations.update(arr => arr.filter(a => a.allocationId !== id));
+          this.allocations.update(arr => arr.filter(a => a.id !== id));
         },
         error: (err) => {
           console.error('Error deleting allocation', err);

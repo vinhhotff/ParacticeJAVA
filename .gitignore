@@ -32,3 +32,9 @@ frontend/.angular/
 
 # OS files
 .DS_Store
+
+# Environment / Secret Files
+.env
+docker/.env
+.agents/
+skills-lock.json
