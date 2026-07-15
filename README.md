@@ -127,3 +127,15 @@ Chạy lệnh sau ở thư mục gốc để chạy toàn bộ unit test của b
 ```bash
 ./mvnw clean test
 ```
+
+---
+
+## 📬 Postman Collection (API Testing)
+Dự án đi kèm với bộ Postman Collection được cấu hình sẵn để Mentor hoặc Học viên dễ dàng thử nghiệm toàn bộ API của hệ thống:
+- **Đường dẫn file collection:** [postman/ResourceAllocation.postman_collection.json](postman/ResourceAllocation.postman_collection.json)
+
+### Hướng dẫn Import & Sử dụng:
+1. Mở ứng dụng **Postman** trên máy tính -> Chọn **Import** ở góc trên cùng bên trái.
+2. Chọn hoặc kéo thả file `ResourceAllocation.postman_collection.json` (nằm trong thư mục `postman/` của dự án) vào vùng import.
+3. Sau khi Import thành công, thư mục **Resource Allocation API** sẽ xuất hiện ở tab *Collections*.
+4. Bộ collection đã được thiết lập sẵn biến môi trường `{{baseUrl}}` trỏ tới `http://localhost:8080/api` và các nhóm request (CRUD, Báo cáo và các API AI nâng cao). Chỉ cần chọn request và bấm **Send** để chạy thử nghiệm!
