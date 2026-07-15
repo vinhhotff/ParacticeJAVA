@@ -117,7 +117,8 @@ public class RiskDetectionService {
                     w.getEmployeeId(), w.getEmployeeName(), w.getTotalAllocation(), w.getAvailable()));
             }
 
-            String prompt = "You are a Project Resource Risk Analyst. Analyze the following team workloads and identify allocation risks. ";
+            String prompt = "You are a Project Resource Risk Analyst. Analyze the following team workloads and identify allocation risks.\n"
+                + "Crucial requirement: You MUST write the 'summary' and all risk 'message' fields in Vietnamese (Tiếng Việt).\n";
             if (customPrompt != null && !customPrompt.trim().isEmpty()) {
                 prompt += "User's Custom Request: \"" + customPrompt + "\"\n";
             }
