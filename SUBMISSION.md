@@ -4,9 +4,9 @@
 ---
 
 ### 👤 Thông tin học viên
-*   **Họ và tên**: [Nhập họ tên của bạn]
-*   **Mã học viên / MSSV**: [Nhập mã của bạn]
-*   **Lớp**: [Nhập tên lớp/khoá học]
+*   **Họ và tên**: Thân Đức Quang Vinh
+*   **Mã học viên / MSSV**: VinhTDQ1
+*   **Lớp**: Fresher Java
 
 ---
 
