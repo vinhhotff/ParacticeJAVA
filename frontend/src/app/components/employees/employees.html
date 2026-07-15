@@ -1,0 +1,139 @@
+<div class="employees-container animate-fade-in">
+  <header class="header">
+    <div class="title-area">
+      <h1>Employees</h1>
+      <p>Manage employee records and monitor active workloads</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Employee
+    </button>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-panel glass-panel">
+    <div class="spinner"></div>
+    <p>Loading employee directory...</p>
+  </div>
+
+  <div *ngIf="!loading()" class="glass-panel table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Full Name</th>
+          <th>Email Address</th>
+          <th>Project Role</th>
+          <th>Department</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emp of employees()">
+          <td><strong>{{ emp.employeeCode }}</strong></td>
+          <td>{{ emp.fullName }}</td>
+          <td>{{ emp.email }}</td>
+          <td><span class="role-badge">{{ emp.role }}</span></td>
+          <td>{{ emp.department }}</td>
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-outline" (click)="viewWorkload(emp.employeeId!)">
+              Check Workload
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="employees().length === 0">
+          <td colspan="6" class="empty-state">No employee records in the directory.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Create Employee Modal -->
+  <div *ngIf="showCreateModal()" class="modal-backdrop" (click)="closeCreateModal()">
+    <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Add New Employee</h2>
+        <button class="close-btn" (click)="closeCreateModal()">&times;</button>
+      </div>
+
+      <form (submit)="createEmployee()" class="modal-form">
+        <div *ngIf="errorMessage()" class="alert alert-danger">
+          {{ errorMessage() }}
+        </div>
+
+        <div class="form-group">
+          <label>Employee Code</label>
+          <input type="text" [(ngModel)]="newEmployee().employeeCode" name="employeeCode" required placeholder="e.g. EMP001">
+        </div>
+
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" [(ngModel)]="newEmployee().fullName" name="fullName" required placeholder="e.g. John Doe">
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" [(ngModel)]="newEmployee().email" name="email" required placeholder="e.g. john@doe.com">
+        </div>
+
+        <div class="form-group">
+          <label>Primary Role</label>
+          <input type="text" [(ngModel)]="newEmployee().role" name="role" required placeholder="e.g. Java Engineer">
+        </div>
+
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" [(ngModel)]="newEmployee().department" name="department" required placeholder="e.g. Engineering">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" (click)="closeCreateModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Employee</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Workload Detail Modal -->
+  <div *ngIf="selectedWorkload()" class="modal-backdrop" (click)="closeWorkload()">
+    <div class="modal-content glass-panel workload-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Workload Analysis</h2>
+        <button class="close-btn" (click)="closeWorkload()">&times;</button>
+      </div>
+
+      <div class="workload-body">
+        <div class="workload-metric">
+          <div class="workload-circle" [style.--percent]="selectedWorkload()!.totalAllocation"
+               [class.warn]="selectedWorkload()!.totalAllocation > 80 && selectedWorkload()!.totalAllocation <= 90"
+               [class.err]="selectedWorkload()!.totalAllocation > 90">
+            <span class="value">{{ selectedWorkload()!.totalAllocation }}%</span>
+            <span class="label">allocated</span>
+          </div>
+          <h3>{{ selectedWorkload()!.fullName }}</h3>
+          <p>{{ selectedWorkload()!.employeeCode }}</p>
+        </div>
+
+        <div class="workload-details">
+          <div class="detail-row">
+            <span>Capacity Status</span>
+            <span *ngIf="selectedWorkload()!.totalAllocation === 0" class="status-pill status-gray">Bench</span>
+            <span *ngIf="selectedWorkload()!.totalAllocation > 0 && selectedWorkload()!.totalAllocation <= 80" class="status-pill status-green">Healthy</span>
+            <span *ngIf="selectedWorkload()!.totalAllocation > 80 && selectedWorkload()!.totalAllocation <= 90" class="status-pill status-yellow">High</span>
+            <span *ngIf="selectedWorkload()!.totalAllocation > 90" class="status-pill status-red">Overloaded</span>
+          </div>
+          <div class="detail-row">
+            <span>Available Capacity</span>
+            <strong [class.green-text]="100 - selectedWorkload()!.totalAllocation > 0">{{ 100 - selectedWorkload()!.totalAllocation }}%</strong>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary" (click)="closeWorkload()">Close Analysis</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+<div class="ai-container animate-fade-in">
+  <header class="header">
+    <div class="title-area">
+      <h1>AI Engine</h1>
+      <p>Consult the RAMS cognitive engine for optimal resource matches and project risk analyses</p>
+    </div>
+  </header>
+
+  <div class="ai-grid">
+    <!-- Left Column: Resource Finder -->
+    <div class="glass-panel panel-section">
+      <h2>AI Resource Matcher</h2>
+      <p class="section-desc">Search for available bench resources by role and free capacity thresholds.</p>
+
+      <form (submit)="findRecommendations()" class="search-form">
+        <div class="form-group">
+          <label>Required Project Role</label>
+          <input type="text" [(ngModel)]="searchRole" name="searchRole" required placeholder="e.g. Java, Python, Angular">
+        </div>
+
+        <div class="form-group">
+          <label>Minimum Available Capacity: <strong>{{ minAvailable() }}%</strong></label>
+          <input type="range" [(ngModel)]="minAvailable" name="minAvailable" min="0" max="100" step="5" class="slider">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Find Matching Resources</button>
+      </form>
+
+      <!-- Recommendations Output -->
+      <div class="results-area">
+        <div *ngIf="loadingRecs()" class="spinner-wrapper">
+          <div class="spinner"></div>
+          <p>Consulting index database...</p>
+        </div>
+
+        <div *ngIf="!loadingRecs() && searchTriggered()">
+          <h3 class="results-title">Optimal Matches</h3>
+          <div class="recs-list">
+            <div *ngFor="let rec of recommendations()" class="rec-card animate-fade-in">
+              <div class="rec-header">
+                <strong>{{ rec.fullName }}</strong>
+                <span>{{ rec.employeeCode }}</span>
+              </div>
+              <div class="rec-body">
+                <span class="role-pill">{{ rec.role }}</span>
+                <span class="capacity-pill">{{ rec.availablePercent }}% free capacity</span>
+              </div>
+            </div>
+            <div *ngIf="recommendations().length === 0" class="empty-state">
+              No matching resources found with at least {{ minAvailable() }}% available capacity.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Project Risks -->
+    <div class="glass-panel panel-section">
+      <h2>Project Risk Analysis</h2>
+      <p class="section-desc">Live alert logs identifying project status health and overall team overload indicators.</p>
+
+      <div *ngIf="loadingRisks()" class="spinner-wrapper">
+        <div class="spinner"></div>
+        <p>Calculating risk coefficients...</p>
+      </div>
+
+      <div *ngIf="!loadingRisks()" class="risks-list">
+        <div *ngFor="let risk of projectRisks()" class="risk-card animate-fade-in"
+             [class.risk-high]="risk.riskLevel === 'HIGH'"
+             [class.risk-medium]="risk.riskLevel === 'MEDIUM'"
+             [class.risk-low]="risk.riskLevel === 'LOW'">
+          <div class="risk-header">
+            <div class="risk-meta">
+              <strong>{{ risk.projectName }}</strong>
+              <span>{{ risk.projectCode }}</span>
+            </div>
+            <div class="risk-badge">
+              Score: {{ risk.riskScore }}
+            </div>
+          </div>
+          <div class="risk-body">
+            <p>{{ risk.riskMessage }}</p>
+            <span class="level-indicator">{{ risk.riskLevel }} RISK</span>
+          </div>
+        </div>
+
+        <div *ngIf="projectRisks().length === 0" class="empty-state">No projects currently analyzed.</div>
+      </div>
+    </div>
+  </div>
+</div>

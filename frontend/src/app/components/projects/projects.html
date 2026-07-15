@@ -1,0 +1,110 @@
+<div class="projects-container animate-fade-in">
+  <header class="header">
+    <div class="title-area">
+      <h1>Projects</h1>
+      <p>Initiate projects and track progress across client work</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Project
+    </button>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-panel glass-panel">
+    <div class="spinner"></div>
+    <p>Loading projects list...</p>
+  </div>
+
+  <div *ngIf="!loading()" class="glass-panel table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Project Name</th>
+          <th>Customer</th>
+          <th>Status</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let proj of projects()">
+          <td><strong>{{ proj.projectCode }}</strong></td>
+          <td>{{ proj.projectName }}</td>
+          <td>{{ proj.customer }}</td>
+          <td>
+            <span class="status-pill" 
+                  [class.status-yellow]="proj.status === 'PLANNING'"
+                  [class.status-green]="proj.status === 'IN_PROGRESS'"
+                  [class.status-red]="proj.status === 'COMPLETED'">
+              {{ proj.status }}
+            </span>
+          </td>
+          <td>{{ proj.startDate }}</td>
+          <td>{{ proj.endDate || 'Indefinite' }}</td>
+        </tr>
+        <tr *ngIf="projects().length === 0">
+          <td colspan="6" class="empty-state">No projects currently found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Create Project Modal -->
+  <div *ngIf="showCreateModal()" class="modal-backdrop" (click)="closeCreateModal()">
+    <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Add New Project</h2>
+        <button class="close-btn" (click)="closeCreateModal()">&times;</button>
+      </div>
+
+      <form (submit)="createProject()" class="modal-form">
+        <div *ngIf="errorMessage()" class="alert alert-danger">
+          {{ errorMessage() }}
+        </div>
+
+        <div class="form-group">
+          <label>Project Code</label>
+          <input type="text" [(ngModel)]="newProject().projectCode" name="projectCode" required placeholder="e.g. PRJ001">
+        </div>
+
+        <div class="form-group">
+          <label>Project Name</label>
+          <input type="text" [(ngModel)]="newProject().projectName" name="projectName" required placeholder="e.g. Cloud Migration">
+        </div>
+
+        <div class="form-group">
+          <label>Customer Name</label>
+          <input type="text" [(ngModel)]="newProject().customer" name="customer" required placeholder="e.g. Acme Corp">
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select [(ngModel)]="newProject().status" name="status" required class="select-field">
+            <option value="PLANNING">PLANNING</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="COMPLETED">COMPLETED</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" [(ngModel)]="newProject().startDate" name="startDate" required>
+        </div>
+
+        <div class="form-group">
+          <label>End Date (Optional)</label>
+          <input type="date" [(ngModel)]="newProject().endDate" name="endDate">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" (click)="closeCreateModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

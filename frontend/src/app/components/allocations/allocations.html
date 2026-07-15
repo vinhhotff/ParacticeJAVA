@@ -1,0 +1,129 @@
+<div class="allocations-container animate-fade-in">
+  <header class="header">
+    <div class="title-area">
+      <h1>Allocations</h1>
+      <p>Assign employees to active projects and monitor allocations</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New Allocation
+    </button>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-panel glass-panel">
+    <div class="spinner"></div>
+    <p>Retrieving active allocations...</p>
+  </div>
+
+  <div *ngIf="!loading()" class="glass-panel table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Project</th>
+          <th>Role in Project</th>
+          <th>Allocation Percent</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let alloc of allocations()">
+          <td>
+            <div class="emp-info">
+              <strong>{{ alloc.employeeName }}</strong>
+              <span>{{ alloc.employeeCode }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="proj-info">
+              <strong>{{ alloc.projectName }}</strong>
+              <span>{{ alloc.projectCode }}</span>
+            </div>
+          </td>
+          <td><span class="role-badge">{{ alloc.roleInProject }}</span></td>
+          <td>
+            <span class="percent-badge"
+                  [class.perc-high]="alloc.allocationPercent > 50 && alloc.allocationPercent <= 80"
+                  [class.perc-danger]="alloc.allocationPercent > 80">
+              {{ alloc.allocationPercent }}%
+            </span>
+          </td>
+          <td>{{ alloc.startDate }}</td>
+          <td>{{ alloc.endDate || 'Indefinite' }}</td>
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-danger" (click)="deleteAllocation(alloc.allocationId!)">
+              End Allocation
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="allocations().length === 0">
+          <td colspan="7" class="empty-state">No active resource allocations found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Create Allocation Modal -->
+  <div *ngIf="showCreateModal()" class="modal-backdrop" (click)="closeCreateModal()">
+    <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Assign Employee to Project</h2>
+        <button class="close-btn" (click)="closeCreateModal()">&times;</button>
+      </div>
+
+      <form (submit)="createAllocation()" class="modal-form">
+        <div *ngIf="errorMessage()" class="alert alert-danger">
+          {{ errorMessage() }}
+        </div>
+
+        <div class="form-group">
+          <label>Employee</label>
+          <select [(ngModel)]="newAllocation().employeeId" name="employeeId" required class="select-field">
+            <option *ngFor="let emp of employees()" [value]="emp.employeeId">
+              {{ emp.fullName }} ({{ emp.employeeCode }} - {{ emp.role }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Project</label>
+          <select [(ngModel)]="newAllocation().projectId" name="projectId" required class="select-field">
+            <option *ngFor="let proj of projects()" [value]="proj.projectId">
+              {{ proj.projectName }} ({{ proj.projectCode }} - {{ proj.status }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Allocation Percent (%)</label>
+          <input type="number" [(ngModel)]="newAllocation().allocationPercent" name="allocationPercent" required min="1" max="100">
+        </div>
+
+        <div class="form-group">
+          <label>Role in Project</label>
+          <input type="text" [(ngModel)]="newAllocation().roleInProject" name="roleInProject" required placeholder="e.g. Lead Frontend Architect">
+        </div>
+
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" [(ngModel)]="newAllocation().startDate" name="startDate" required>
+        </div>
+
+        <div class="form-group">
+          <label>End Date (Optional)</label>
+          <input type="date" [(ngModel)]="newAllocation().endDate" name="endDate">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" (click)="closeCreateModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Allocate Resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
