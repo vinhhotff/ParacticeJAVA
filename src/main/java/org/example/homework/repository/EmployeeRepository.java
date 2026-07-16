@@ -18,12 +18,15 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByEmployeeCode(String employeeCode);
     Optional<Employee> findByEmail(String email);
     List<Employee> findByRoleContainingIgnoreCase(String role);
+    
+    @Query("SELECT DISTINCT e FROM Employee e JOIN e.skills s WHERE LOWER(s.name) = LOWER(:skillName)")
+    List<Employee> findBySkillName(@Param("skillName") String skillName);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT e FROM Employee e WHERE e.employeeId = :id")
     Optional<Employee> findByIdWithLock(@Param("id") Long id);
 
-    @Query("SELECT e.employeeId, e.employeeCode, e.fullName, COALESCE(SUM(a.allocationPercent), 0) " +
+    @Query("SELECT e.employeeId, e.employeeCode, e.fullName, COALESCE(SUM(CASE WHEN a.status = 'ACTIVE' THEN a.allocationPercent ELSE 0 END), 0) " +
            "FROM Employee e LEFT JOIN e.allocations a " +
            "GROUP BY e.employeeId, e.employeeCode, e.fullName")
     List<Object[]> getEmployeeAllocationSums();

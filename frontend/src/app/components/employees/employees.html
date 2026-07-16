@@ -10,6 +10,42 @@
     </button>
   </header>
 
+  <!-- Search by Skill Section -->
+  <div class="glass-panel search-by-skill-section" style="margin-bottom: 24px; padding: 20px 24px;">
+    <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; color: var(--text-muted);">Traditional Search: Find Employees By Skill</h3>
+    <form (submit)="triggerSearchBySkill(); $event.preventDefault();" style="display: flex; gap: 12px; align-items: center;">
+      <div style="position: relative; flex-grow: 1;">
+        <i class="fa-solid fa-code" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
+        <input type="text" [(ngModel)]="searchSkill" name="searchSkill" placeholder="Type a skill name to search (e.g. Java, Python, React)..." 
+               style="width: 100%; padding: 10px 14px 10px 38px; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--glass-border); border-radius: 8px; color: #fff; font-size: 0.85rem; outline: none; transition: border-color 0.2s;"
+               (input)="triggerSearchBySkill()">
+      </div>
+      <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-magnifying-glass"></i> Search
+      </button>
+    </form>
+
+    <!-- Search Results -->
+    <div *ngIf="searchTriggered()" style="margin-top: 16px;">
+      <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-weight: 600; letter-spacing: 0.05em;">Search Results</h4>
+      <div *ngIf="searchSkillResults().length === 0" style="font-size: 0.85rem; color: var(--danger); padding: 8px 12px; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.1); border-radius: 6px;">
+        No employees found matching skill: "<strong>{{ searchSkill() }}</strong>"
+      </div>
+      <div *ngIf="searchSkillResults().length > 0" class="skill-search-results-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px;">
+        <div *ngFor="let res of searchSkillResults()" class="skill-search-result-item" 
+             style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 8px; font-size: 0.85rem;">
+          <strong style="color: #fff;">{{ res.employeeName }}</strong>
+          <span class="capacity-pill" [style.background]="res.available >= 50 ? 'rgba(52, 211, 153, 0.1)' : 'rgba(248, 113, 113, 0.1)'" 
+                 [style.color]="res.available >= 50 ? 'var(--success)' : 'var(--danger)'"
+                 [style.border]="res.available >= 50 ? '1px solid rgba(52, 211, 153, 0.15)' : '1px solid rgba(52, 211, 153, 0.15)'"
+                 style="font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; font-weight: 500;">
+            {{ res.available }}% available
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Loading State -->
   <div *ngIf="loading()" class="loading-panel glass-panel">
     <div class="spinner"></div>
@@ -31,7 +67,16 @@
       <tbody>
         <tr *ngFor="let emp of paginatedEmployees()">
           <td><strong>{{ emp.employeeCode }}</strong></td>
-          <td>{{ emp.fullName }}</td>
+          <td>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="color: #fff; font-weight: 500;">{{ emp.fullName }}</span>
+              <div *ngIf="emp.skills && emp.skills.length > 0" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px;">
+                <span *ngFor="let s of emp.skills" style="font-size: 0.7rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1px 6px; color: var(--text-muted);">
+                  {{ s }}
+                </span>
+              </div>
+            </div>
+          </td>
           <td>{{ emp.email }}</td>
           <td><span class="role-badge">{{ emp.role }}</span></td>
           <td>{{ emp.department }}</td>
@@ -108,6 +153,11 @@
         <div class="form-group">
           <label>Department</label>
           <input type="text" [(ngModel)]="newEmployee().department" name="department" required placeholder="e.g. Engineering">
+        </div>
+
+        <div class="form-group">
+          <label>Skills (comma separated)</label>
+          <input type="text" [(ngModel)]="skillsInput" name="skillsInput" placeholder="e.g. Java, Spring Boot, PostgreSQL">
         </div>
 
         <div class="modal-actions">

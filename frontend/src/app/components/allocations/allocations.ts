@@ -123,13 +123,37 @@ export class Allocations implements OnInit {
   }
 
   deleteAllocation(id: number): void {
-    if (confirm('Are you sure you want to end this project allocation?')) {
+    if (confirm('Are you sure you want to delete this allocation record?')) {
       this.allocationService.delete(id).subscribe({
         next: () => {
           this.allocations.update(arr => arr.filter(a => a.id !== id));
         },
         error: (err) => {
           console.error('Error deleting allocation', err);
+        }
+      });
+    }
+  }
+
+  activateAllocation(id: number): void {
+    this.allocationService.activate(id).subscribe({
+      next: () => {
+        this.allocationService.getAll().subscribe(data => this.allocations.set(data));
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Failed to activate allocation.');
+      }
+    });
+  }
+
+  endAllocation(id: number): void {
+    if (confirm('Are you sure you want to transition this allocation to ENDED status?')) {
+      this.allocationService.end(id).subscribe({
+        next: () => {
+          this.allocationService.getAll().subscribe(data => this.allocations.set(data));
+        },
+        error: (err) => {
+          alert(err.error?.message || 'Failed to end allocation.');
         }
       });
     }

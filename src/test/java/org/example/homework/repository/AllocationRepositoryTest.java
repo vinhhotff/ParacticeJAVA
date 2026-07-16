@@ -55,6 +55,7 @@ class AllocationRepositoryTest {
             .allocationPercent(30)
             .roleInProject("Dev")
             .startDate(LocalDate.now())
+            .status(org.example.homework.entity.enums.AllocationStatus.ACTIVE)
             .build();
         Allocation allocation2 = Allocation.builder()
             .employee(savedEmployee)
@@ -62,6 +63,7 @@ class AllocationRepositoryTest {
             .allocationPercent(40)
             .roleInProject("Lead")
             .startDate(LocalDate.now())
+            .status(org.example.homework.entity.enums.AllocationStatus.ACTIVE)
             .build();
 
         Allocation savedAlloc1 = allocationRepository.save(allocation1);

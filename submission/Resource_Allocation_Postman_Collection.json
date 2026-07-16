@@ -63,6 +63,72 @@
               ]
             }
           }
+        },
+        {
+          "name": "Add Employee Skills",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n    \"Java\",\n    \"Spring Boot\",\n    \"PostgreSQL\"\n]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/1/skills",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employees",
+                "1",
+                "skills"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Skills",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/employees/1/skills",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employees",
+                "1",
+                "skills"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Employees By Skill",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/employees/search?skill=Java",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employees",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "skill",
+                  "value": "Java"
+                }
+              ]
+            }
+          }
         }
       ]
     },
@@ -177,6 +243,40 @@
               "path": [
                 "allocations",
                 "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Activate Allocation",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/allocations/1/activate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "allocations",
+                "1",
+                "activate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "End Allocation",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/allocations/1/end",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "allocations",
+                "1",
+                "end"
               ]
             }
           }

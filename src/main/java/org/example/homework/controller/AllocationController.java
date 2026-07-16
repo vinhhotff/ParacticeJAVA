@@ -55,4 +55,18 @@ public class AllocationController {
         allocationService.removeAllocation(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<AllocationResponse> activate(@PathVariable Long id) {
+        log.info("Activate allocation request: {}", id);
+        AllocationResponse response = allocationService.activateAllocation(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/end")
+    public ResponseEntity<AllocationResponse> end(@PathVariable Long id) {
+        log.info("End allocation request: {}", id);
+        AllocationResponse response = allocationService.endAllocation(id);
+        return ResponseEntity.ok(response);
+    }
 }

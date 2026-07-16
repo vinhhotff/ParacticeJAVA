@@ -12,10 +12,10 @@ import java.util.List;
 @Repository
 public interface AllocationRepository extends JpaRepository<Allocation, Long> {
 
-    @Query("SELECT COALESCE(SUM(a.allocationPercent), 0) FROM Allocation a WHERE a.employee.employeeId = :employeeId")
+    @Query("SELECT COALESCE(SUM(a.allocationPercent), 0) FROM Allocation a WHERE a.employee.employeeId = :employeeId AND a.status = org.example.homework.entity.enums.AllocationStatus.ACTIVE")
     int sumAllocationByEmployeeId(@Param("employeeId") Long employeeId);
 
-    @Query("SELECT COALESCE(SUM(a.allocationPercent), 0) FROM Allocation a WHERE a.employee.employeeId = :employeeId AND a.allocationId != :excludeAllocationId")
+    @Query("SELECT COALESCE(SUM(a.allocationPercent), 0) FROM Allocation a WHERE a.employee.employeeId = :employeeId AND a.allocationId != :excludeAllocationId AND a.status = org.example.homework.entity.enums.AllocationStatus.ACTIVE")
     int sumAllocationByEmployeeIdExcluding(@Param("employeeId") Long employeeId, @Param("excludeAllocationId") Long excludeAllocationId);
 
     @Query("SELECT a FROM Allocation a WHERE a.employee.employeeId = :employeeId " +

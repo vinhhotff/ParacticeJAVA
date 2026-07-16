@@ -93,4 +93,62 @@ class AllocationServiceTest {
 
         assertThrows(ProjectNotFoundException.class, () -> allocationService.createAllocation(request));
     }
+
+    @Test
+    void should_ActivateAllocation_When_Pending() {
+        Employee employee = Employee.builder().employeeId(1L).employeeCode("E1").build();
+        Project project = Project.builder().projectId(2L).projectCode("P2").build();
+        Allocation allocation = Allocation.builder()
+            .allocationId(10L)
+            .employee(employee)
+            .project(project)
+            .allocationPercent(50)
+            .status(org.example.homework.entity.enums.AllocationStatus.PENDING)
+            .build();
+
+        when(allocationRepository.findById(10L)).thenReturn(Optional.of(allocation));
+        when(allocationRepository.save(any(Allocation.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AllocationResponse response = allocationService.activateAllocation(10L);
+
+        assertNotNull(response);
+        assertEquals("ACTIVE", response.getStatus());
+        verify(validationOrchestrator, times(1)).validate(any(AllocationRequest.class), eq(10L));
+    }
+
+    @Test
+    void should_ThrowWorkflowException_When_AlreadyActiveOrEnded() {
+        Allocation active = Allocation.builder()
+            .allocationId(10L)
+            .status(org.example.homework.entity.enums.AllocationStatus.ACTIVE)
+            .build();
+        Allocation ended = Allocation.builder()
+            .allocationId(11L)
+            .status(org.example.homework.entity.enums.AllocationStatus.ENDED)
+            .build();
+
+        when(allocationRepository.findById(10L)).thenReturn(Optional.of(active));
+        when(allocationRepository.findById(11L)).thenReturn(Optional.of(ended));
+
+        assertThrows(org.example.homework.exception.InvalidWorkflowException.class, () -> allocationService.activateAllocation(10L));
+        assertThrows(org.example.homework.exception.InvalidWorkflowException.class, () -> allocationService.activateAllocation(11L));
+    }
+
+    @Test
+    void should_EndAllocation_When_Called() {
+        Allocation allocation = Allocation.builder()
+            .allocationId(10L)
+            .employee(Employee.builder().build())
+            .project(Project.builder().build())
+            .status(org.example.homework.entity.enums.AllocationStatus.ACTIVE)
+            .build();
+
+        when(allocationRepository.findById(10L)).thenReturn(Optional.of(allocation));
+        when(allocationRepository.save(any(Allocation.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AllocationResponse response = allocationService.endAllocation(10L);
+
+        assertNotNull(response);
+        assertEquals("ENDED", response.getStatus());
+    }
 }

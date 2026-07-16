@@ -37,4 +37,9 @@ public class Allocation {
 
     @Column(name = "end_date")
     private LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    @Builder.Default
+    private org.example.homework.entity.enums.AllocationStatus status = org.example.homework.entity.enums.AllocationStatus.PENDING;
 }

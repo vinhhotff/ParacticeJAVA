@@ -61,4 +61,23 @@ public class EmployeeController {
         WorkloadResponse response = employeeService.getWorkload(id);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/{id}/skills")
+    public ResponseEntity<Void> addSkills(@PathVariable Long id, @RequestBody List<String> skills) {
+        log.info("Add skills to employee {}: {}", id, skills);
+        employeeService.addSkills(id, skills);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/skills")
+    public ResponseEntity<List<String>> getSkills(@PathVariable Long id) {
+        log.info("Get skills of employee: {}", id);
+        return ResponseEntity.ok(employeeService.getSkills(id));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<org.example.homework.dto.response.EmployeeSkillSearchResponse>> searchBySkill(@RequestParam String skill) {
+        log.info("Search employees by skill: {}", skill);
+        return ResponseEntity.ok(employeeService.searchBySkill(skill));
+    }
 }

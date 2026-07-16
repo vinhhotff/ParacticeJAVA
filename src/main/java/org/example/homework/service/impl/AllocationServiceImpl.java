@@ -70,6 +70,7 @@ public class AllocationServiceImpl implements AllocationService {
             .roleInProject(request.getRoleInProject())
             .startDate(request.getStartDate())
             .endDate(request.getEndDate())
+            .status(org.example.homework.entity.enums.AllocationStatus.PENDING)
             .build();
 
         Allocation saved = allocationRepository.save(allocation);
@@ -133,6 +134,52 @@ public class AllocationServiceImpl implements AllocationService {
             .roleInProject(entity.getRoleInProject())
             .startDate(entity.getStartDate())
             .endDate(entity.getEndDate())
+            .status(entity.getStatus() != null ? entity.getStatus().name() : null)
             .build();
+    }
+
+    @Override
+    @Transactional
+    public AllocationResponse activateAllocation(Long id) {
+        log.info("[ACTIVATE_ALLOCATION] | id={}", id);
+        Allocation allocation = allocationRepository.findById(id)
+            .orElseThrow(() -> new AllocationNotFoundException(id));
+
+        if (allocation.getStatus() == org.example.homework.entity.enums.AllocationStatus.ACTIVE) {
+            throw new org.example.homework.exception.InvalidWorkflowException("Allocation is already ACTIVE");
+        }
+        if (allocation.getStatus() == org.example.homework.entity.enums.AllocationStatus.ENDED) {
+            throw new org.example.homework.exception.InvalidWorkflowException("Allocation is ENDED and cannot be activated again");
+        }
+
+        // Validate capacity using a temporary request structure
+        AllocationRequest validationRequest = AllocationRequest.builder()
+            .employeeId(allocation.getEmployee().getEmployeeId())
+            .projectId(allocation.getProject().getProjectId())
+            .allocationPercent(allocation.getAllocationPercent())
+            .roleInProject(allocation.getRoleInProject())
+            .startDate(allocation.getStartDate())
+            .endDate(allocation.getEndDate())
+            .build();
+
+        validationOrchestrator.validate(validationRequest, id);
+
+        allocation.setStatus(org.example.homework.entity.enums.AllocationStatus.ACTIVE);
+        Allocation saved = allocationRepository.save(allocation);
+        log.info("[ACTIVATE_ALLOCATION_SUCCESS] | id={}", id);
+        return toResponse(saved);
+    }
+
+    @Override
+    @Transactional
+    public AllocationResponse endAllocation(Long id) {
+        log.info("[END_ALLOCATION] | id={}", id);
+        Allocation allocation = allocationRepository.findById(id)
+            .orElseThrow(() -> new AllocationNotFoundException(id));
+
+        allocation.setStatus(org.example.homework.entity.enums.AllocationStatus.ENDED);
+        Allocation saved = allocationRepository.save(allocation);
+        log.info("[END_ALLOCATION_SUCCESS] | id={}", id);
+        return toResponse(saved);
     }
 }

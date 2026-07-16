@@ -39,6 +39,21 @@ COMMENT ON COLUMN project.description_embedding IS 'Vector embedding of project 
 
 CREATE INDEX idx_project_description_embedding ON project USING hnsw (description_embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
 
+-- Skill Table
+CREATE TABLE skill (
+    skill_id      BIGSERIAL    PRIMARY KEY,
+    name          VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Employee-Skill Join Table
+CREATE TABLE employee_skill (
+    employee_id   BIGINT       NOT NULL,
+    skill_id      BIGINT       NOT NULL,
+    PRIMARY KEY (employee_id, skill_id),
+    CONSTRAINT fk_employee_skill_employee FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE,
+    CONSTRAINT fk_employee_skill_skill FOREIGN KEY (skill_id) REFERENCES skill(skill_id) ON DELETE CASCADE
+);
+
 -- Resource Allocation Table
 CREATE TABLE allocation (
     allocation_id      BIGSERIAL    PRIMARY KEY,
@@ -48,9 +63,11 @@ CREATE TABLE allocation (
     role_in_project    VARCHAR(100) NOT NULL,
     start_date         DATE         NOT NULL,
     end_date           DATE,
+    status             VARCHAR(20)  NOT NULL DEFAULT 'PENDING',
     CONSTRAINT fk_allocation_employee FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE,
     CONSTRAINT fk_allocation_project FOREIGN KEY (project_id) REFERENCES project(project_id) ON DELETE CASCADE,
-    CONSTRAINT chk_allocation_percent CHECK (allocation_percent >= 1 AND allocation_percent <= 100)
+    CONSTRAINT chk_allocation_percent CHECK (allocation_percent >= 1 AND allocation_percent <= 100),
+    CONSTRAINT chk_allocation_status CHECK (status IN ('PENDING', 'ACTIVE', 'ENDED'))
 );
 
 COMMENT ON TABLE allocation IS 'Employee project allocation';

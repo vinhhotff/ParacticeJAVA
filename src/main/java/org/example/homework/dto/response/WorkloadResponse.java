@@ -10,5 +10,6 @@ public class WorkloadResponse {
     private Long employeeId;
     private String employeeName;
     private Integer totalAllocation;
+    private Integer allocated;
     private Integer available;
 }

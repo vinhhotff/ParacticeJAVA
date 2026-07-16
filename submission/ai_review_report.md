@@ -109,4 +109,44 @@ Trong khi yêu cầu tại mục 8 đề cập định dạng bọc ngoài:
 *Đánh giá*: Giao diện Angular frontend hiện tại đang bind theo cấu trúc danh sách phẳng được trả về từ Controller. Nếu cần sửa đổi cho giống tuyệt đối tài liệu mục 8, có thể bọc lại DTO trả về. Tuy nhiên, API hiện tại trả về nhiều metadata bổ ích như `matchScore`, `employeeCode` và `role` giúp UI trực quan hơn.
 
 ---
-**Kết luận:** Backend đã hoàn thiện tốt, code sạch, có phân tách Validator Strategy Pattern chuẩn SOLID, và sẵn sàng deploy.
+
+## 6. Nâng Cấp Version 1.5 (AI Assistance & Prompt History)
+
+Dưới đây là tài liệu chi tiết về quá trình cộng tác với AI để thiết kế và hiện thực hóa các tính năng nâng cấp trong phiên bản 1.5:
+
+### 💬 Prompt 1: Thiết kế Database & JPA Mapping cho Kỹ năng (Skill Many-to-Many)
+*   **Prompt đã sử dụng**: 
+    > "Hãy hướng dẫn thiết kế CSDL Many-to-Many giữa Employee và Skill. Viết SQL script tạo bảng `skill` và bảng liên kết `employee_skill`, đồng thời viết code JPA Mapping `@ManyToMany` trong entity Java."
+*   **AI Feedback**:
+    *   Tạo bảng `skill` với khóa chính tự tăng và thuộc tính `name` duy nhất.
+    *   Tạo bảng join `employee_skill` chứa cặp khóa ngoại tham chiếu đến hai bảng tương ứng để làm khóa chính kép.
+    *   Sử dụng `@ManyToMany` kết hợp `@JoinTable` trong entity `Employee` và dùng `mappedBy` trong entity `Skill` để thiết lập mối quan hệ hai chiều. Khuyên dùng `@JsonIgnore` trên thuộc tính đối ứng để tránh lỗi lặp vòng tuần hoàn khi serialize JSON.
+*   **Cải tiến đã thực hiện**:
+    *   Đã viết Flyway migration file `V4__upgrade_to_v1_5.sql`.
+    *   Đã tạo entity [Skill.java](file:///Users/thanvinh/Desktop/restaurant/HOMEWORK/src/main/java/org/example/homework/entity/Skill.java) và cập nhật [Employee.java](file:///Users/thanvinh/Desktop/restaurant/HOMEWORK/src/main/java/org/example/homework/entity/Employee.java) đúng chuẩn JPA.
+
+### 💬 Prompt 2: Hiện thực quy trình trạng thái phân bổ (Workflow State Machine)
+*   **Prompt đã sử dụng**:
+    > "Hãy hướng dẫn viết API chuyển trạng thái cho Allocation từ PENDING sang ACTIVE, và từ ACTIVE sang ENDED. Chỉ PENDING mới được ACTIVE. Khi ACTIVE cần chạy lại bộ kiểm tra capacity 100%. ENDED không được ACTIVE lại."
+*   **AI Feedback**:
+    *   Định nghĩa Enum `AllocationStatus` với các giá trị: `PENDING`, `ACTIVE`, `ENDED`.
+    *   Viết custom exception `InvalidWorkflowException` (kế thừa từ `BusinessException`) để xử lý các chuyển đổi trạng thái bất hợp lệ.
+    *   Trong phương thức `activateAllocation`, sử dụng bộ validate `validationOrchestrator.validate` bằng cách dựng một request DTO tạm thời từ thông tin phân bổ hiện tại để chạy lại toàn bộ business rules.
+*   **Cải tiến đã thực hiện**:
+    *   Tạo enum [AllocationStatus.java](file:///Users/thanvinh/Desktop/restaurant/HOMEWORK/src/main/java/org/example/homework/entity/enums/AllocationStatus.java) và tích hợp vào [Allocation.java](file:///Users/thanvinh/Desktop/restaurant/HOMEWORK/src/main/java/org/example/homework/entity/Allocation.java).
+    *   Viết class exception [InvalidWorkflowException.java](file:///Users/thanvinh/Desktop/restaurant/HOMEWORK/src/main/java/org/example/homework/exception/InvalidWorkflowException.java).
+    *   Cập nhật `MaxAllocationValidator` chỉ tích lũy phần trăm đối với phân bổ `ACTIVE`, giải phóng capacity cho các phân bổ ở trạng thái `PENDING` và `ENDED`.
+    *   Cài đặt API kích hoạt/kết thúc phân bổ trong [AllocationServiceImpl.java](file:///Users/thanvinh/Desktop/restaurant/HOMEWORK/src/main/java/org/example/homework/service/impl/AllocationServiceImpl.java).
+
+### 💬 Prompt 3: Tìm kiếm nhân viên theo kỹ năng & kiểm tra dung lượng còn lại
+*   **Prompt đã sử dụng**:
+    > "Viết truy vấn JPQL tìm nhân viên có kỹ năng tương ứng. Tính toán dung lượng khả dụng của họ (100 - tổng phân bổ ACTIVE) và trả về DTO phù hợp."
+*   **AI Feedback**:
+    *   Sử dụng JPQL JOIN query: `SELECT DISTINCT e FROM Employee e JOIN e.skills s WHERE LOWER(s.name) = LOWER(:skillName)`.
+    *   Viết truy vấn SQL/JPQL tính tổng dung lượng chỉ lấy các allocation có trạng thái `ACTIVE` của nhân sự.
+*   **Cải tiến đã thực hiện**:
+    *   Cập nhật các phương thức đếm trong `AllocationRepository` và `EmployeeRepository` để chỉ tính các allocation đang hoạt động.
+    *   Hiện thực API tìm kiếm `/api/employees/search?skill=...` trả về DTO `EmployeeSkillSearchResponse` chuẩn.
+
+---
+**Kết luận:** Hệ thống RAMS đã được nâng cấp toàn diện lên v1.5 thành công. Toàn bộ mã nguồn backend, frontend, tài liệu, cơ sở dữ liệu và bộ kiểm thử đã được cập nhật đồng bộ và hoạt động ổn định 100%.

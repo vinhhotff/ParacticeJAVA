@@ -19,6 +19,12 @@ export class Employees implements OnInit {
   protected readonly selectedEmployeeId = signal<number | null>(null);
   protected readonly selectedWorkload = signal<EmployeeWorkload | null>(null);
 
+  // Skill Management & Search
+  protected readonly skillsInput = signal<string>('');
+  protected readonly searchSkill = signal<string>('');
+  protected readonly searchSkillResults = signal<Array<{ employeeName: string; available: number }>>([]);
+  protected readonly searchTriggered = signal(false);
+
   // Pagination
   protected readonly currentPage = signal(1);
   protected readonly pageSize = 5;
@@ -77,6 +83,7 @@ export class Employees implements OnInit {
       role: '',
       department: ''
     });
+    this.skillsInput.set('');
     this.errorMessage.set(null);
     this.showCreateModal.set(true);
   }
@@ -85,6 +92,7 @@ export class Employees implements OnInit {
     this.isEditMode.set(true);
     this.selectedEmployeeId.set(emp.id || null);
     this.newEmployee.set({ ...emp });
+    this.skillsInput.set(emp.skills ? emp.skills.join(', ') : '');
     this.errorMessage.set(null);
     this.showCreateModal.set(true);
   }
@@ -105,8 +113,30 @@ export class Employees implements OnInit {
     this.errorMessage.set(null);
     this.employeeService.create(this.newEmployee()).subscribe({
       next: (created) => {
-        this.employees.update(arr => [...arr, created]);
-        this.closeCreateModal();
+        const empId = created.id!;
+        const skills = this.skillsInput().split(',')
+          .map(s => s.trim())
+          .filter(s => s.length > 0);
+
+        if (skills.length > 0) {
+          this.employeeService.addSkills(empId, skills).subscribe({
+            next: () => {
+              created.skills = skills;
+              this.employees.update(arr => [...arr, created]);
+              this.closeCreateModal();
+            },
+            error: (err) => {
+              console.error('Failed to add skills', err);
+              created.skills = [];
+              this.employees.update(arr => [...arr, created]);
+              this.closeCreateModal();
+            }
+          });
+        } else {
+          created.skills = [];
+          this.employees.update(arr => [...arr, created]);
+          this.closeCreateModal();
+        }
       },
       error: (err) => {
         this.errorMessage.set(err.error?.message || 'Failed to create employee. Double check input parameters.');
@@ -120,8 +150,23 @@ export class Employees implements OnInit {
     this.errorMessage.set(null);
     this.employeeService.update(id, this.newEmployee()).subscribe({
       next: (updated) => {
-        this.employees.update(arr => arr.map(e => e.id === id ? updated : e));
-        this.closeCreateModal();
+        const skills = this.skillsInput().split(',')
+          .map(s => s.trim())
+          .filter(s => s.length > 0);
+
+        this.employeeService.addSkills(id, skills).subscribe({
+          next: () => {
+            updated.skills = skills;
+            this.employees.update(arr => arr.map(e => e.id === id ? updated : e));
+            this.closeCreateModal();
+          },
+          error: (err) => {
+            console.error('Failed to add skills', err);
+            updated.skills = skills;
+            this.employees.update(arr => arr.map(e => e.id === id ? updated : e));
+            this.closeCreateModal();
+          }
+        });
       },
       error: (err) => {
         this.errorMessage.set(err.error?.message || 'Failed to update employee.');
@@ -155,5 +200,25 @@ export class Employees implements OnInit {
 
   closeWorkload(): void {
     this.selectedWorkload.set(null);
+  }
+
+  triggerSearchBySkill(): void {
+    const query = this.searchSkill().trim();
+    if (!query) {
+      this.searchSkillResults.set([]);
+      this.searchTriggered.set(false);
+      return;
+    }
+    this.employeeService.searchBySkill(query).subscribe({
+      next: (data) => {
+        this.searchSkillResults.set(data);
+        this.searchTriggered.set(true);
+      },
+      error: (err) => {
+        console.error('Error searching by skill', err);
+        this.searchSkillResults.set([]);
+        this.searchTriggered.set(true);
+      }
+    });
   }
 }

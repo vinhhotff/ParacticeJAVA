@@ -37,6 +37,9 @@ public class MaxAllocationValidator implements AllocationValidator {
         }
 
         for (Allocation a : overlaps) {
+            if (a.getStatus() != org.example.homework.entity.enums.AllocationStatus.ACTIVE) {
+                continue;
+            }
             if (a.getStartDate().isAfter(startDate) && (endDate == null || !a.getStartDate().isAfter(endDate))) {
                 datesToCheck.add(a.getStartDate());
             }
@@ -51,6 +54,9 @@ public class MaxAllocationValidator implements AllocationValidator {
         for (LocalDate date : datesToCheck) {
             int currentSum = 0;
             for (Allocation a : overlaps) {
+                if (a.getStatus() != org.example.homework.entity.enums.AllocationStatus.ACTIVE) {
+                    continue;
+                }
                 if (!date.isBefore(a.getStartDate()) && (a.getEndDate() == null || !date.isAfter(a.getEndDate()))) {
                     currentSum += a.getAllocationPercent();
                 }

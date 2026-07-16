@@ -5,12 +5,14 @@ export interface Employee {
   email: string;
   role: string;
   department: string;
+  skills?: string[];
 }
 
 export interface EmployeeWorkload {
   employeeId: number;
   employeeName: string;
   totalAllocation: number;
+  allocated?: number;
   available: number;
 }
 
@@ -36,6 +38,7 @@ export interface Allocation {
   roleInProject: string;
   startDate: string;
   endDate?: string;
+  status?: 'PENDING' | 'ACTIVE' | 'ENDED';
 }
 
 export interface UtilizationReportItem {

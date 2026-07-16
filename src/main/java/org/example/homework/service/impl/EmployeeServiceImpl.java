@@ -14,6 +14,8 @@ import org.example.homework.service.EmployeeService;
 import org.example.homework.embedding.EmbeddingServiceClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.example.homework.entity.Skill;
+import org.example.homework.repository.SkillRepository;
 import java.util.List;
 
 @Service
@@ -24,6 +26,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final AllocationRepository allocationRepository;
     private final EmbeddingServiceClient embeddingServiceClient;
+    private final SkillRepository skillRepository;
 
     @Override
     @Transactional
@@ -126,8 +129,54 @@ public class EmployeeServiceImpl implements EmployeeService {
             .employeeId(employee.getEmployeeId())
             .employeeName(employee.getFullName())
             .totalAllocation(totalAllocation)
+            .allocated(totalAllocation)
             .available(available)
             .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getSkills(Long employeeId) {
+        log.info("Get skills for employee: {}", employeeId);
+        Employee employee = employeeRepository.findById(employeeId)
+            .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
+        return employee.getSkills().stream().map(Skill::getName).toList();
+    }
+
+    @Override
+    @Transactional
+    public void addSkills(Long employeeId, List<String> skillNames) {
+        log.info("Add skills {} to employee {}", skillNames, employeeId);
+        Employee employee = employeeRepository.findById(employeeId)
+            .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
+
+        for (String skillName : skillNames) {
+            if (skillName == null || skillName.trim().isEmpty()) {
+                continue;
+            }
+            final String name = skillName.trim();
+            Skill skill = skillRepository.findByName(name)
+                .orElseGet(() -> skillRepository.save(Skill.builder().name(name).build()));
+            if (!employee.getSkills().contains(skill)) {
+                employee.getSkills().add(skill);
+            }
+        }
+        employeeRepository.save(employee);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<org.example.homework.dto.response.EmployeeSkillSearchResponse> searchBySkill(String skillName) {
+        log.info("Search employees by skill name: {}", skillName);
+        List<Employee> employees = employeeRepository.findBySkillName(skillName);
+        return employees.stream().map(emp -> {
+            int totalAllocation = allocationRepository.sumAllocationByEmployeeId(emp.getEmployeeId());
+            int available = 100 - totalAllocation;
+            return org.example.homework.dto.response.EmployeeSkillSearchResponse.builder()
+                .employeeName(emp.getFullName())
+                .available(available)
+                .build();
+        }).toList();
     }
 
     private void validateEmployeeUniqueness(EmployeeRequest request) {
@@ -147,6 +196,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             .email(entity.getEmail())
             .role(entity.getRole())
             .department(entity.getDepartment())
+            .skills(entity.getSkills() != null ? entity.getSkills().stream().map(Skill::getName).toList() : List.of())
             .build();
     }
 

@@ -53,6 +53,7 @@ class MaxAllocationValidatorTest {
             .allocationPercent(50)
             .startDate(today.minusDays(5))
             .endDate(today.plusDays(5))
+            .status(org.example.homework.entity.enums.AllocationStatus.ACTIVE)
             .build();
 
         when(allocationRepository.findOverlappingAllocations(1L, today, null, null))
@@ -76,6 +77,7 @@ class MaxAllocationValidatorTest {
             .allocationPercent(50)
             .startDate(today.minusDays(5))
             .endDate(today.plusDays(5))
+            .status(org.example.homework.entity.enums.AllocationStatus.ACTIVE)
             .build();
 
         when(allocationRepository.findOverlappingAllocations(1L, today, null, null))
@@ -99,6 +101,7 @@ class MaxAllocationValidatorTest {
             .allocationPercent(40)
             .startDate(today.minusDays(5))
             .endDate(today.plusDays(5))
+            .status(org.example.homework.entity.enums.AllocationStatus.ACTIVE)
             .build();
 
         when(allocationRepository.findOverlappingAllocations(1L, today, null, 10L))

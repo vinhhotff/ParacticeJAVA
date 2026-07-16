@@ -30,4 +30,12 @@ export class AllocationService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  activate(id: number): Observable<Allocation> {
+    return this.http.put<Allocation>(`${this.baseUrl}/${id}/activate`, {});
+  }
+
+  end(id: number): Observable<Allocation> {
+    return this.http.put<Allocation>(`${this.baseUrl}/${id}/end`, {});
+  }
 }

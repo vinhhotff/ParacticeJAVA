@@ -12,4 +12,7 @@ public interface EmployeeService {
     EmployeeResponse update(Long id, EmployeeRequest request);
     void delete(Long id);
     WorkloadResponse getWorkload(Long id);
+    List<String> getSkills(Long employeeId);
+    void addSkills(Long employeeId, List<String> skillNames);
+    List<org.example.homework.dto.response.EmployeeSkillSearchResponse> searchBySkill(String skillName);
 }

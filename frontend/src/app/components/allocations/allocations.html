@@ -26,6 +26,7 @@
           <th>Allocation Percent</th>
           <th>Start Date</th>
           <th>End Date</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -53,9 +54,24 @@
           </td>
           <td>{{ alloc.startDate }}</td>
           <td>{{ alloc.endDate || 'Indefinite' }}</td>
+          <td>
+            <span class="status-pill" 
+                  [class.status-yellow]="alloc.status === 'PENDING' || !alloc.status"
+                  [class.status-green]="alloc.status === 'ACTIVE'"
+                  [class.status-gray]="alloc.status === 'ENDED'"
+                  style="font-size: 0.75rem; font-weight: 600;">
+              {{ alloc.status || 'PENDING' }}
+            </span>
+          </td>
           <td class="actions-cell">
-            <button class="btn btn-sm btn-danger" (click)="deleteAllocation(alloc.id!)" style="display: inline-flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-link-slash"></i> End Allocation
+            <button *ngIf="alloc.status === 'PENDING' || !alloc.status" class="btn btn-sm btn-primary" (click)="activateAllocation(alloc.id!)" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 0.75rem; height: auto;">
+              <i class="fa-solid fa-play"></i> Activate
+            </button>
+            <button *ngIf="alloc.status === 'ACTIVE'" class="btn btn-sm btn-outline" (click)="endAllocation(alloc.id!)" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 0.75rem; height: auto;">
+              <i class="fa-solid fa-power-off"></i> End
+            </button>
+            <button *ngIf="alloc.status !== 'ACTIVE'" class="btn btn-sm btn-danger" (click)="deleteAllocation(alloc.id!)" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 0.75rem; height: auto;">
+              <i class="fa-solid fa-trash-can"></i> Delete
             </button>
           </td>
         </tr>

@@ -13,4 +13,5 @@ public class EmployeeResponse {
     private String email;
     private String role;
     private String department;
+    private java.util.List<String> skills;
 }

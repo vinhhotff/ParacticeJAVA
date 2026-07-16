@@ -34,4 +34,14 @@ export class EmployeeService {
   getWorkload(id: number): Observable<EmployeeWorkload> {
     return this.http.get<EmployeeWorkload>(`${this.baseUrl}/${id}/workload`);
   }
+
+  addSkills(id: number, skills: string[]): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/skills`, skills);
+  }
+
+  searchBySkill(skill: string): Observable<Array<{ employeeName: string; available: number }>> {
+    return this.http.get<Array<{ employeeName: string; available: number }>>(`${this.baseUrl}/search`, {
+      params: { skill }
+    });
+  }
 }
