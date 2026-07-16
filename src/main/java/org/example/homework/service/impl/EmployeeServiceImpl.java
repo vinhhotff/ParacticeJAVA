@@ -146,10 +146,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public void addSkills(Long employeeId, List<String> skillNames) {
-        log.info("Add skills {} to employee {}", skillNames, employeeId);
+        log.info("Synchronize skills {} for employee {}", skillNames, employeeId);
         Employee employee = employeeRepository.findById(employeeId)
             .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
+        employee.getSkills().clear();
         for (String skillName : skillNames) {
             if (skillName == null || skillName.trim().isEmpty()) {
                 continue;
