@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.homework.dto.request.ProjectRequest;
 import org.example.homework.dto.response.ProjectResponse;
 import org.example.homework.entity.Project;
+import org.example.homework.entity.Allocation;
 import org.example.homework.entity.enums.ProjectStatus;
 import org.example.homework.exception.DuplicateException;
 import org.example.homework.exception.InvalidDateRangeException;
@@ -83,6 +84,17 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public org.example.homework.dto.response.PageResponse<ProjectResponse> findAll(org.springframework.data.domain.Pageable pageable) {
+        log.debug("Listing projects with pagination: {}", pageable);
+        org.springframework.data.domain.Page<Project> page = projectRepository.findAll(pageable);
+        List<ProjectResponse> content = page.getContent().stream()
+            .map(this::toResponse)
+            .toList();
+        return org.example.homework.dto.response.PageResponse.from(page, content);
+    }
+
+    @Override
     @Transactional
     public ProjectResponse update(Long id, ProjectRequest request) {
         log.info("[UPDATE_PROJECT] | id={}", id);
@@ -124,6 +136,11 @@ public class ProjectServiceImpl implements ProjectService {
         log.info("[DELETE_PROJECT] | id={}", id);
         Project project = projectRepository.findById(id)
             .orElseThrow(() -> new ProjectNotFoundException(id));
+        if (project.getAllocations() != null) {
+            for (Allocation allocation : project.getAllocations()) {
+                allocation.setStatus(org.example.homework.entity.enums.AllocationStatus.ENDED);
+            }
+        }
         projectRepository.delete(project);
         log.info("[DELETE_PROJECT_SUCCESS] | id={}", id);
     }

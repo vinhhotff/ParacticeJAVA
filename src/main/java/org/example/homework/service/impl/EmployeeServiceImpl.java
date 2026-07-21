@@ -6,6 +6,7 @@ import org.example.homework.dto.request.EmployeeRequest;
 import org.example.homework.dto.response.EmployeeResponse;
 import org.example.homework.dto.response.WorkloadResponse;
 import org.example.homework.entity.Employee;
+import org.example.homework.entity.Allocation;
 import org.example.homework.exception.DuplicateException;
 import org.example.homework.exception.EmployeeNotFoundException;
 import org.example.homework.repository.AllocationRepository;
@@ -70,6 +71,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public org.example.homework.dto.response.PageResponse<EmployeeResponse> findAll(org.springframework.data.domain.Pageable pageable) {
+        log.debug("Listing employees with pagination: {}", pageable);
+        org.springframework.data.domain.Page<Employee> page = employeeRepository.findAll(pageable);
+        List<EmployeeResponse> content = page.getContent().stream()
+            .map(this::toResponse)
+            .toList();
+        return org.example.homework.dto.response.PageResponse.from(page, content);
+    }
+
+    @Override
     @Transactional
     public EmployeeResponse update(Long id, EmployeeRequest request) {
         log.info("[UPDATE_EMPLOYEE] | id={} | code={}", id, request.getEmployeeCode());
@@ -108,6 +120,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         log.info("[DELETE_EMPLOYEE] | id={}", id);
         Employee employee = employeeRepository.findById(id)
             .orElseThrow(() -> new EmployeeNotFoundException(id));
+        if (employee.getAllocations() != null) {
+            for (Allocation allocation : employee.getAllocations()) {
+                allocation.setStatus(org.example.homework.entity.enums.AllocationStatus.ENDED);
+            }
+        }
         employeeRepository.delete(employee);
         log.info("[DELETE_EMPLOYEE_SUCCESS] | id={}", id);
     }
@@ -158,9 +175,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             final String name = skillName.trim();
             Skill skill = skillRepository.findByName(name)
                 .orElseGet(() -> skillRepository.save(Skill.builder().name(name).build()));
-            if (!employee.getSkills().contains(skill)) {
-                employee.getSkills().add(skill);
-            }
+            employee.getSkills().add(skill);
         }
         employeeRepository.save(employee);
     }

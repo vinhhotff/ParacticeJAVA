@@ -35,7 +35,24 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmployeeResponse>> getAll() {
+    public ResponseEntity<?> getAll(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(defaultValue = "employeeId,asc") String sort) {
+        if (page != null && size != null) {
+            log.info("Get paginated employees request: page={}, size={}, sort={}", page, size, sort);
+            String[] sortParts = sort.split(",");
+            String sortBy = sortParts[0];
+            org.springframework.data.domain.Sort.Direction direction = 
+                (sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")) 
+                ? org.springframework.data.domain.Sort.Direction.DESC 
+                : org.springframework.data.domain.Sort.Direction.ASC;
+            
+            org.springframework.data.domain.Pageable pageable = 
+                org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, sortBy));
+            return ResponseEntity.ok(employeeService.findAll(pageable));
+        }
+
         log.info("Get all employees request");
         List<EmployeeResponse> response = employeeService.findAll();
         return ResponseEntity.ok(response);

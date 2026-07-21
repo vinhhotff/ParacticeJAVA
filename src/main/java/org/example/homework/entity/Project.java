@@ -14,6 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@org.hibernate.annotations.SQLDelete(sql = "UPDATE project SET deleted_at = CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS BIGINT) WHERE project_id = ?")
+@org.hibernate.annotations.SQLRestriction("deleted_at = 0")
 public class Project {
 
     @Id
@@ -43,4 +45,8 @@ public class Project {
     @Builder.Default
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Allocation> allocations = new ArrayList<>();
+
+    @Column(name = "deleted_at", nullable = false)
+    @Builder.Default
+    private Long deletedAt = 0L;
 }

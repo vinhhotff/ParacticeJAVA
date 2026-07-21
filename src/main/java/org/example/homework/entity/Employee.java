@@ -12,6 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@org.hibernate.annotations.SQLDelete(sql = "UPDATE employee SET deleted_at = CAST(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) AS BIGINT) WHERE employee_id = ?")
+@org.hibernate.annotations.SQLRestriction("deleted_at = 0")
 public class Employee {
 
     @Id
@@ -46,4 +48,8 @@ public class Employee {
         inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
     private List<Skill> skills = new ArrayList<>();
+
+    @Column(name = "deleted_at", nullable = false)
+    @Builder.Default
+    private Long deletedAt = 0L;
 }

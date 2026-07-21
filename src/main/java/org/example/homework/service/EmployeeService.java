@@ -9,6 +9,7 @@ public interface EmployeeService {
     EmployeeResponse create(EmployeeRequest request);
     EmployeeResponse findById(Long id);
     List<EmployeeResponse> findAll();
+    org.example.homework.dto.response.PageResponse<EmployeeResponse> findAll(org.springframework.data.domain.Pageable pageable);
     EmployeeResponse update(Long id, EmployeeRequest request);
     void delete(Long id);
     WorkloadResponse getWorkload(Long id);

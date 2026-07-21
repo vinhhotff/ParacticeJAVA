@@ -8,6 +8,7 @@ public interface ProjectService {
     ProjectResponse create(ProjectRequest request);
     ProjectResponse findById(Long id);
     List<ProjectResponse> findAll();
+    org.example.homework.dto.response.PageResponse<ProjectResponse> findAll(org.springframework.data.domain.Pageable pageable);
     ProjectResponse update(Long id, ProjectRequest request);
     void delete(Long id);
 }
