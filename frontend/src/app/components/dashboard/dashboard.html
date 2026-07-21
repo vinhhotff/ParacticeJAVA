@@ -120,5 +120,58 @@
         </section>
       </div>
     </div>
+
+    <!-- Department Workload Summary Section -->
+    <div class="full-width-section" style="margin-top: 24px;">
+      <section class="glass-panel report-section department-panel">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-building-user" style="margin-right: 8px; color: var(--info);"></i>Department Workload Summary</h2>
+          <p class="section-desc">Average, max, and min allocations grouped by organizational department</p>
+        </div>
+        <div class="table-responsive" style="margin-top: 16px;">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Headcount</th>
+                <th>Average Allocation</th>
+                <th>Max Allocation</th>
+                <th>Min Allocation</th>
+                <th>Workload Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of departmentReport()">
+                <td><strong>{{ item.department }}</strong></td>
+                <td>{{ item.headcount }} resources</td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 45px;">{{ item.averageAllocation | number:'1.0-1' }}%</span>
+                    <div class="progress-bar-bg" style="width: 80px; margin-bottom: 0;">
+                      <div class="progress-bar-fill" [style.width.%]="item.averageAllocation"
+                           [class.warn]="item.averageAllocation > 70 && item.averageAllocation <= 90"
+                           [class.err]="item.averageAllocation > 90"></div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="emp-val" [class.danger]="item.maxAllocation > 90">{{ item.maxAllocation }}%</span></td>
+                <td>{{ item.minAllocation }}%</td>
+                <td>
+                  <span class="badge" 
+                        [class.badge-danger]="item.averageAllocation > 85" 
+                        [class.badge-warning]="item.averageAllocation > 60 && item.averageAllocation <= 85"
+                        [class.badge-success]="item.averageAllocation <= 60">
+                    {{ item.averageAllocation > 85 ? 'Overworked' : (item.averageAllocation > 60 ? 'Optimal' : 'Underutilized') }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="departmentReport().length === 0">
+                <td colspan="6" class="empty-state">No department summary data found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </div>
 </div>

@@ -82,3 +82,20 @@ export interface RiskReport {
   summary: string;
   workloadSummary: EmployeeWorkload[];
 }
+
+export interface DepartmentReportItem {
+  department: string;
+  headcount: number;
+  averageAllocation: number;
+  maxAllocation: number;
+  minAllocation: number;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}

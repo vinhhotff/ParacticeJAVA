@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UtilizationReportItem, AvailableResourceItem, OverloadedEmployeeItem } from '../models';
+import { UtilizationReportItem, AvailableResourceItem, OverloadedEmployeeItem, DepartmentReportItem } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -21,5 +21,9 @@ export class ReportService {
 
   getOverloadedEmployeesReport(): Observable<OverloadedEmployeeItem[]> {
     return this.http.get<OverloadedEmployeeItem[]>(`${this.baseUrl}/overloaded`);
+  }
+
+  getDepartmentSummaryReport(): Observable<DepartmentReportItem[]> {
+    return this.http.get<DepartmentReportItem[]>(`${this.baseUrl}/departments`);
   }
 }

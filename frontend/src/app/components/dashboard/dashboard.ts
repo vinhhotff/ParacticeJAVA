@@ -4,7 +4,7 @@ import { EmployeeService } from '../../services/employee.service';
 import { ProjectService } from '../../services/project.service';
 import { AllocationService } from '../../services/allocation.service';
 import { ReportService } from '../../services/report.service';
-import { UtilizationReportItem, AvailableResourceItem, OverloadedEmployeeItem } from '../../models';
+import { UtilizationReportItem, AvailableResourceItem, OverloadedEmployeeItem, DepartmentReportItem } from '../../models';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -21,6 +21,7 @@ export class Dashboard implements OnInit {
   protected readonly utilizationReport = signal<UtilizationReportItem[]>([]);
   protected readonly availableReport = signal<AvailableResourceItem[]>([]);
   protected readonly overloadedReport = signal<OverloadedEmployeeItem[]>([]);
+  protected readonly departmentReport = signal<DepartmentReportItem[]>([]);
   protected readonly loading = signal(true);
 
   constructor(
@@ -37,7 +38,8 @@ export class Dashboard implements OnInit {
       allocations: this.allocationService.getAll(),
       utilization: this.reportService.getUtilizationReport(),
       available: this.reportService.getAvailableResourcesReport(),
-      overloaded: this.reportService.getOverloadedEmployeesReport()
+      overloaded: this.reportService.getOverloadedEmployeesReport(),
+      department: this.reportService.getDepartmentSummaryReport()
     }).subscribe({
       next: (data) => {
         this.totalEmployees.set(data.employees.length);
@@ -46,6 +48,7 @@ export class Dashboard implements OnInit {
         this.utilizationReport.set(data.utilization);
         this.availableReport.set(data.available);
         this.overloadedReport.set(data.overloaded);
+        this.departmentReport.set(data.department);
         this.loading.set(false);
       },
       error: (err) => {
