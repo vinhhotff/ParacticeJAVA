@@ -168,14 +168,18 @@ public class EmployeeServiceImpl implements EmployeeService {
             .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         employee.getSkills().clear();
-        for (String skillName : skillNames) {
-            if (skillName == null || skillName.trim().isEmpty()) {
-                continue;
+        if (skillNames != null) {
+            List<String> distinctSkillNames = skillNames.stream()
+                .filter(name -> name != null && !name.trim().isEmpty())
+                .map(String::trim)
+                .distinct()
+                .toList();
+
+            for (String name : distinctSkillNames) {
+                Skill skill = skillRepository.findByName(name)
+                    .orElseGet(() -> skillRepository.save(Skill.builder().name(name).build()));
+                employee.getSkills().add(skill);
             }
-            final String name = skillName.trim();
-            Skill skill = skillRepository.findByName(name)
-                .orElseGet(() -> skillRepository.save(Skill.builder().name(name).build()));
-            employee.getSkills().add(skill);
         }
         employeeRepository.save(employee);
     }

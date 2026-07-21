@@ -18,6 +18,14 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByEmployeeCode(String employeeCode);
     Optional<Employee> findByEmail(String email);
     List<Employee> findByRoleContainingIgnoreCase(String role);
+
+    @Override
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"skills"})
+    List<Employee> findAll();
+
+    @Override
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"skills"})
+    org.springframework.data.domain.Page<Employee> findAll(org.springframework.data.domain.Pageable pageable);
     
     @Query("SELECT DISTINCT e FROM Employee e JOIN e.skills s WHERE LOWER(s.name) = LOWER(:skillName)")
     List<Employee> findBySkillName(@Param("skillName") String skillName);

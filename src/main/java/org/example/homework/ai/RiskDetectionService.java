@@ -27,6 +27,7 @@ public class RiskDetectionService {
 
     private final EmployeeRepository employeeRepository;
     private final AllocationRepository allocationRepository;
+    private final RestTemplate restTemplate;
 
     @Value("${gemini.api.key:}")
     private String geminiApiKey;
@@ -106,7 +107,6 @@ public class RiskDetectionService {
         }
 
         try {
-            RestTemplate restTemplate = new RestTemplate();
             String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=" + apiKey;
 
             // Build context string

@@ -15,12 +15,13 @@ import java.util.*;
 @Component
 @Primary
 @Slf4j
+@lombok.RequiredArgsConstructor
 public class HttpEmbeddingServiceClient implements EmbeddingServiceClient {
 
     @Value("${embedding.service.url:http://localhost:5000}")
     private String serviceUrl;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private static final int EMBEDDING_DIMENSION = 384;
     private final Random random = new Random(42);
 
